@@ -6,9 +6,20 @@
 \section{Literature Overview}
 %-------------------------------------------%
 
-A section that gives an overview of the types of literature relevant to your capstone. The literature sections may vary. The literature section as a whole should generally tie together forms of literature related to your project. Think of this major section as an interweaved annotated bibliography. Please include at least eight sources.
+In this section we will discuss and justify our project's software stack before briefly reviewing related research projects.
 
 Here is an example citation \cite{Doe2017}.
+
+%-------------------------------------------%
+
+
+
+\section{Environment}
+%-------------------------------------------%
+
+We have opted to use our own personal computers running 64-bit Windows 10 with Ubuntu subsystems as both our platform and development environment. There are several reasons to justify this decision. First, we wanted to ensure that we would have the best possible experience when dealing with GPU computation, and NVIDIA simply has a longer and better track record for supporting Windows than it does for Linux. Second, we wanted to avoid the potential pitfall of our platform restricting us to a smaller library of target games. Our two top candidates were {\it Quake} and {\it Rivals of Aether} because both of these games support replays, or demos; however, only one of them natively supports Linux. Last, and with regards to using our own computers for both development and testing, we made the decision to abstain from distributed or cloud computing chiefly to save costs, but also as an aesthetic choice based in the desire to see what our computers are capable of.
+
+Despite all of the above justifications for using Windows, it remains to be said that our project cannot live without Linux. For reasons discussed in the next section, we use a Redis server which runs on an Ubuntu subsystem. The solution may not sound elegant, but it was certainly simple to set up.
 
 %-------------------------------------------%
 
@@ -17,7 +28,11 @@ Here is an example citation \cite{Doe2017}.
 \section{Software}
 %-------------------------------------------%
 
-Predecessor or current software projects related to your capstone area. May be libraries that you are incorporating in your project, projects that are inspiring your design, a project you are building on, etc...
+Our project uses a software stack consisting on SerpentAI, Redis, Keras, TensorFlow-GPU, and the Anaconda distribution for Python 3.
+We chose Python 3 for its flexibility, simplicity, and data processing capabilities, in addition to its compatibility with other tools and libraries. 
+
+
+SerpentAI serves as a bridge between our program and its training platform, providing a simple interface for retrieving frame buffer data in addition to sending input. The Anaconda distribution provides us with a large assortment of Python modules, some of which SerpentAI cites as dependencies. This allows us to more easily work from within a Windows environment, which in turn gives us the most straightforward access to GPU computation on our NVIDIA video cards, by way of NVIDIA's CUDA and CUDNN libraries.
 
 %-------------------------------------------%
 
