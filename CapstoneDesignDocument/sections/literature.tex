@@ -14,23 +14,10 @@ Here is an example citation \cite{Doe2017}.
 
 
 
-\section{Environment}
-%-------------------------------------------%
-
-We have opted to use our own personal computers running 64-bit Windows 10 with Ubuntu subsystems as both our platform and development environment. There are several reasons to justify this decision. First, we wanted to ensure that we would have the best possible experience when dealing with GPU computation, and NVIDIA simply has a longer and better track record for supporting Windows than it does for Linux. Second, we wanted to avoid the potential pitfall of our platform restricting us to a smaller library of target games. Our two top candidates were {\it Quake} and {\it Rivals of Aether} because both of these games support replays, or demos; however, only one of them natively supports Linux. Last, and with regards to using our own computers for both development and testing, we made the decision to abstain from distributed or cloud computing chiefly to save costs, but also as an aesthetic choice based in the desire to see what our computers are capable of.
-
-Despite all of the above justifications for using Windows, it remains to be said that our project cannot live without Linux. For reasons discussed in the next section, we use a Redis server which runs on an Ubuntu subsystem. The solution may not sound elegant, but it was certainly simple to set up.
-
-%-------------------------------------------%
-
-
-
 \section{Software}
 %-------------------------------------------%
 
-Our project uses a software stack comprised of the following: SerpentAI, Keras, TensorFlow-GPU, and the Anaconda distribution for Python 3. We chose to use Python 3 as our primary programming language for its flexibility, intuitive syntax, and data processing capabilities. Python is also helpfully compatible with all of the other software listed above.
-
-SerpentAI serves as a bridge between our program and its testing environment, providing a simple interface for retrieving frame buffer data from any given videogame runtime and then sending input data back. The Anaconda distribution provides us with a large assortment of Python modules, some of which SerpentAI cites as dependencies. This allows us to more easily work from within a Windows environment, which in turn gives us the most straightforward access to GPU computation on our NVIDIA video cards, by way of NVIDIA's CUDA and CUDNN libraries.
+Predecessor or current software projects related to your capstone area. May be libraries that you are incorporating in your project, projects that are inspiring your design, a project you are building on, etc...
 
 %-------------------------------------------%
 
