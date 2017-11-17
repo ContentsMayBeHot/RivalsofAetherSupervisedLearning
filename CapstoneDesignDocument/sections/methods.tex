@@ -28,7 +28,7 @@ Our project uses a software stack comprised of the following modules and librari
 
 We chose to use Python 3 as our primary programming language for its flexibility, intuitive syntax, and data processing capabilities. Python is also helpfully compatible with all of the other software listed above. Furthermore, the Anaconda distribution provides us with a large assortment of Python modules, some of which SerpentAI cites as dependencies. This allows us to more easily work from within a Windows environment, which in turn gives us the most straightforward and stable access to GPU computation via NVIDIA proprietary drivers.
 
-SerpentAI serves as a bridge between our program and its testing environment, providing a simple interface for retrieving frame buffer data from and sending control input to virtually any arbitrary game runtime. 
+SerpentAI serves as a bridge between our artificial intelligence and its testing environment by providing a simple interface for retrieving frame buffer data from and sending control input to virtually any game runtime. This is achieved by writing a game agent program. Our game agent utilizes TensorFlow, a popular machine-learning library. However, does not access TensorFlow directly. Rather, it uses Keras, a high-level machine-learning library designed to serve as an abstraction layer over foundational libraries like TensorFlow. The low-level library still performs all of the heavy-lifting; Keras simply removes some of the barriers to entry.
 
 %-------------------------------------------%
 
