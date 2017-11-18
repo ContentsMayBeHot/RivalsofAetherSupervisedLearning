@@ -21,8 +21,31 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
-\bibitem{Doe2017}
-J.~Doe, ``An amazingly awesome paper,'' \emph{IEEE Transactions on
-  Awesomeness}, vol.~13, no.~2, pp. 321--332, 2017.
+\bibitem{Alvernaz:2017}
+\BIBentryALTinterwordspacing
+S.~Alvernaz and J.~Togelius, ``Autoencoder-augmented neuroevolution for visual
+  doom playing,'' \emph{CoRR}, vol. abs/1707.03902, 2017. [Online]. Available:
+  \url{http://arxiv.org/abs/1707.03902}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Dosovitskiy:2016}
+\BIBentryALTinterwordspacing
+A.~Dosovitskiy and V.~Koltun, ``Learning to act by predicting the future,''
+  \emph{CoRR}, vol. abs/1611.01779, 2016. [Online]. Available:
+  \url{http://arxiv.org/abs/1611.01779}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Gorman:2006}
+\BIBentryALTinterwordspacing
+B.~Gorman and M.~Humphrys, ``Towards integrated imitation of strategic planning
+  and motion modeling in interactive computer games,'' \emph{Comput.
+  Entertain.}, vol.~4, no.~4, Oct. 2006. [Online]. Available:
+  \url{http://doi.acm.org/10.1145/1178418.1178432}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Thurau:2004}
+C.~Thurau and C.~Bauckhage, ``Learning human-like movement behavior for
+  computer games,'' in \emph{In Proceedings of the Eighth International
+  Conference on the Simulation of Adaptive Behavior (SAB04}, 2004.
 
 \end{thebibliography}
