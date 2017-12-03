@@ -24,9 +24,19 @@ In {\it ViZDoom: A Doom-based AI Research Platform for Visual Reinforcement}, Co
 
 \section{Software}
 %-------------------------------------------%
-{\it Serpent.AI} is an Open Source Python framework for creating Game Agents. This framework allows developers to transform any video game into a "sandbox environment ripe for experimentation".
+{\it Serpent.AI} is an open source Python framework that allows researchers to write game agents that can easily retrieve the frame buffer from a game and then send keyboard or controller input back to it. The framework is noteworthy for functioning entirely independently of the target game. Furthermore, it makes no presumptions about what machine learning techniques the user wants to implement and can support anything from simple reflex agents to the most advanced and cutting-edge neural networks.
 
-Predecessor or current software projects related to your capstone area. May be libraries that you are incorporating in your project, projects that are inspiring your design, a project you are building on, etc...
+The target game for this project is {\it Rivals of Aether}, a 2D fighting game created by independent game developer Dan Fornace. We selected {\it Rivals of Aether} because it supports the recording of replays, which are files that keep a record of what controller inputs were detected from which player during each frame of gameplay. Thus, whereas a conventional video recording associates each frame with its pixel data, a replay does so with each frame and its input data. This allows the game to simulate a past match in real-time with perfect accuracy by simply running a new match in which each player's control input is read from the replay file rather than from the controller.
+
+\begin{figure}
+	\caption{"Screenshot showing gameplay in Rivals of Aether"}
+	\centering
+	\includegraphics[scale = 0.5]{game.png} \\
+\end{figure}
+
+A replay file is therefore no different from a demo file from {\it Quake} or {\it Doom}. Such demos are often used in game-related machine learning research because a collection of demos is effectively a pre-labeled dataset. However, unlike {\it Doom} and {\it Quake}, which have websites such as {\it Speed Demo Archives} and {\it Quake Terminus}, {\it Rivals of Aether} does not have any well-established public repositories for replay files. Therefore, in order to build our collection of replays, we solicited from the {\it Rivals of Aether} community. Contributors provided us with a total of 1,020 replay files from a variety of settings, including tournaments, exhibitions, ranked matches, and private games. Adding our own personal replays brings the total up to 1,032. This dataset will be randomly distributed such that around eighty-percent goes into a training set, fifteen-percent into a testing set, and the remainder into a validation set.
+
+A training session will run as follows. A {\it SerpentAI} agent will traverse the game's menus to initiate playback of a replay from the training set, which has been shuffled ahead of time. While the match is being simulated, the agent will simultaneously read the visual buffer from the game and control input data from the replay file. For each frame, the agent will pair the input data with its corresponding visual buffer and then send this bundle to a TensorFlow neural network as labels and data, respectively. The neural network will attempt to produce a set of appropriate control inputs in response. When playback has concluded, the agent will traverse the menus once again to start a new replay, repeatedly, until it has reached its quota.
 
 %-------------------------------------------%
 
