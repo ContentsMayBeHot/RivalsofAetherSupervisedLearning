@@ -63,6 +63,12 @@ Descriptions and processes of any analytical methods used as part of your capsto
 
 A brief overview of primary features you plan to implement.
 
+\begin{figure}
+	\caption{"Keyboard controls for Rivals of Aether"}
+	\centering
+	\includegraphics[scale = 0.75]{controls.png} \\
+\end{figure}
+
 %-------------------------------------------%
 
 
@@ -70,7 +76,11 @@ A brief overview of primary features you plan to implement.
 \section{Test Plan}
 %-------------------------------------------%
 
-A brief overview of what and how you plan to test your project codebase.
+We have over 1,000 data points in the form of replay files. This dataset will be randomly distributed such that around eighty-percent goes into a training set, fifteen-percent into a testing set, and the remainder into a validation set.
+
+A training session will run as follows. The {\it SerpentAI} agent will traverse the game's menus to initiate playback of the next replay from a shuffled copy of the training set. While the match is simulated, the agent will simultaneously read the visual buffer from the game and control input data from the replay file. For each frame, the agent will pair the input data with its corresponding visual buffer and then send this bundle to a TensorFlow neural network as labels and data, respectively. The neural network will attempt to produce a set of appropriate control inputs in response and adjust its weights  whenever its prediction are incorrect. When playback has concluded, the agent will traverse the menus once again to start a new replay, repeatedly, until it has reached its quota. The total number of training iterations will vary between experiments until it produces satisfactory results.
+
+A properly trained neural network shall demonstrate several qualities other than a high accuracy when tested against the held back data. Firstly, it shall be able to defeat low-level in-game bots, thereby demonstrating its competence. This can be tested by placing the neural network in matches against bots of increasing difficulty, thereby enabling the assignment of numerical performance benchmarks. Secondly, it shall play in a believably-human manner. This means that it should, wherever possible, be discouraged from playing {\it inhumanly} well, getting stuck, or displaying mechanical tics. Examples of these undesirable behaviors would include, in order, executing nonstop frame-perfect moves throughout the course of an entire game, running off of the stage or standing still due to an as-of-yet unseen situation, or constantly changing direction for no reason while otherwise playing competently. Identifying all such behaviors will be difficult prior to live experiments, however.
 
 %-------------------------------------------%
 
