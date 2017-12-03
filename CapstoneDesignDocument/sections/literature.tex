@@ -20,6 +20,7 @@ In {\it Arnold: An Autonomous Agent to play FPS Games}, Devendra Singh Chaplot a
 
 In {\it ViZDoom: A Doom-based AI Research Platform for Visual Reinforcement}, Cornell University researchers Michal Kempa, Marek Wydmuch, Grzegorz Runc, Jakub Toczek, and Wojciech Jaśkowski discuss the benefits of ViZDoom as a research platform \cite{Kempka:2016}. They first discuss the projects that led to the creation of ViZDoom, those being Atari 2600 A.I. projects. It then discusses the jump from 2D environments to 3D environments. While it mat seem like a large jump in reality a 3D space can be abstracted into many 2D environments. They go on to describe ViZDoom as a lightweight, fast and highly customizable framework. They researchers designed two bots and trained them. The result was two human-like A.I. which proved ViZDoom to be a useful project that could really contribute to the field \cite{Kempka:2016}.
 
+In {\it MariFlow - Self-Driving Mario Kart w/Recurrent Neural Network}, YouTuber SethBling trains a recurrent neural network to play Mario Kart using only the visual buffer \cite{SethBling:2017}. The goal of SethBling's project is to train the neural network to mimic the way he plays the game by having it learn from fifteen hours of his own recorded gameplay. The network receives "a low-resolution grayscale version of the screen" for input and employs multiple layers, sigmoid neurons, backpropagation, and "long short term memory" or LSTM cells in order to predict the appropriate controller action. Furthermore, SethBling runs "interactive sessions" in which he monitors the neural network while it plays the game so that he can identify situations in which it gets stuck; he then takes over control of the game so that he can show the neural network what to do in such situations \cite{SethBling:2017}.
 
 \section{Software}
 %-------------------------------------------%
@@ -33,9 +34,7 @@ The target game for this project is {\it Rivals of Aether}, a 2D fighting game c
 	\includegraphics[scale = 0.5]{game.png} \\
 \end{figure}
 
-A replay file is therefore no different from a demo file from {\it Quake} or {\it Doom}. Such demos are often used in game-related machine learning research because a collection of demos is effectively a pre-labeled dataset. However, unlike {\it Doom} and {\it Quake}, which have websites such as {\it Speed Demo Archives} and {\it Quake Terminus}, {\it Rivals of Aether} does not have any well-established public repositories for replay files. Therefore, in order to build our collection of replays, we solicited from the {\it Rivals of Aether} community. Contributors provided us with a total of 1,020 replay files from a variety of settings, including tournaments, exhibitions, ranked matches, and private games. Adding our own personal replays brings the total up to 1,032. This dataset will be randomly distributed such that around eighty-percent goes into a training set, fifteen-percent into a testing set, and the remainder into a validation set.
-
-A training session will run as follows. A {\it SerpentAI} agent will traverse the game's menus to initiate playback of a replay from the training set, which has been shuffled ahead of time. While the match is being simulated, the agent will simultaneously read the visual buffer from the game and control input data from the replay file. For each frame, the agent will pair the input data with its corresponding visual buffer and then send this bundle to a TensorFlow neural network as labels and data, respectively. The neural network will attempt to produce a set of appropriate control inputs in response. When playback has concluded, the agent will traverse the menus once again to start a new replay, repeatedly, until it has reached its quota.
+A replay file is therefore no different from a demo file from {\it Quake} or {\it Doom}. Such demos are often used in game-related machine learning research because a collection of demos is effectively a pre-labeled dataset. However, unlike {\it Doom} and {\it Quake}, which have websites such as {\it Speed Demo Archives} and {\it Quake Terminus}, {\it Rivals of Aether} does not have any well-established public repositories for replay files. Therefore, in order to build our collection of replays, we solicited from the {\it Rivals of Aether} community. Contributors provided us with a total of 1,020 replay files from a variety of settings, including tournaments, exhibitions, ranked matches, and private games. Adding our own personal replays brings the total up to 1,032. 
 
 %-------------------------------------------%
 
@@ -44,6 +43,6 @@ A training session will run as follows. A {\it SerpentAI} agent will traverse th
 \section{Other Sources}
 %-------------------------------------------%
 
-Non-academic sources such as white papers, manuals, blogs, etc.
+
 
 %-------------------------------------------%
