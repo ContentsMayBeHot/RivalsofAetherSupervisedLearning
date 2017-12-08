@@ -4,7 +4,7 @@
 \section{Problem Statement}
 %-------------------------------------------%
 
-Artificial intelligence (hereafter referred to as AI) in video games has often been used for either academic research or for customer analytics. We are a team of two undergraduate researchers who wish to see cutting-edge machine learning techniques, such as recurrent neural networks, applied in a way with which the general public can interact and, ultimately, have fun.
+Artificial intelligence (hereafter referred to as AI) in video games has often been used for either academic research or customer analytics. We are a team of two undergraduate researchers who wish to see cutting-edge machine learning techniques, such as recurrent neural networks, applied in a way with which the general public can interact and, ultimately, have fun.
 
 %-------------------------------------------%
 
@@ -13,7 +13,9 @@ Artificial intelligence (hereafter referred to as AI) in video games has often b
 \section{Purpose Statement}
 %-------------------------------------------%
 
- In order to employ machine learning techniques as a means for entertainment, this project seeks to develop a videogame AI opponent that is fun to play against. The AI shall only be able to make use of the visual buffer as its input. There are two reasons for this constraint. Firstly and chiefly, the visual buffer is readily available from outside of the game's runtime, and can therefore be obtained without the use of hooks or APIs provided by said runtime. This decouples the techniques used to produce the agent from any specific game, thereby rendering those techniques reusable. Secondly, if the AI can effectively play with only the visual buffer, then it will essentially be playing with the same information with which a human would play. Additionally, this constraint further differentiates the AI from conventional game agents, which are allowed to make decisions based on explicit and concisely packaged game state information such as coordinates, predefined navigational paths, and health points.
+ In order to employ machine learning techniques as a means for entertainment, this project seeks to develop a videogame AI opponent that is fun to play against. The AI shall only be able to make use of the visual buffer as its input. There are two reasons for this constraint. Firstly and chiefly, the visual buffer is readily available from outside of the game's runtime, and can therefore be obtained without the use of hooks or APIs provided by said runtime. This decouples the techniques used to inform and train the agent from any specific game implementation, thereby rendering those techniques reusable. Secondly, if the AI can effectively play with only access to the visual buffer, then it will essentially be playing with the same information with which a human would play. Additionally, this constraint further differentiates the AI from conventional game agents, which are allowed to make decisions based on explicit and concisely packaged game state information such as coordinates, predefined navigational paths, and health points.
+ 
+ The AI produced in this project will play {\it Rivals of Aether}, which is a two-dimensional or "2D" fighting game created by independent game developer Dan Fornace \cite{RivalsofAether}.
 
 %-------------------------------------------%
 
@@ -29,6 +31,8 @@ Other groups are contributing to the advancement of AI, although they are not as
 Finding cutting-edge AI techniques in the game industry is quite hard. Many developers find these techniques to be both impractical and excessive. These implementations use up sought after resources. Why should they create more work for themselves when many of the problems that we are looking to solve can be reduced to smaller problems with nice well defined algorithms?
 
 With this information, one may think that almost no one uses advanced A.I. in games, and that is primarily the case. However, some companies are implementing these advanced techniques. Instead of using AI to create a diverse experience, they use it to push sales for specific features. This is the case with Activision's recently acquired patent, which defines a method for manipulating players into engaging with microtransactions.
+
+TALK ABOUT DEMOS AND REPLAYS HERE
 
 %-------------------------------------------%
 
