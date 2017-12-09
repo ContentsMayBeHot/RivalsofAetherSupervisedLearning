@@ -5,7 +5,7 @@
 %-------------------------------------------%
 
 \begin{figure}
-	\caption{"Data flow within our software stack"}
+	\caption{Data flow within our software stack}
 	\centering
 		\includegraphics[scale = 0.75]{dataflow.png} \\
 \end{figure}
@@ -30,7 +30,7 @@ We have opted to use our own personal computers running 64-bit Windows 10 with U
 %-------------------------------------------%
 
 
-Our approach to creating this A.I. is to use a modular neural network. This neural network will use a combination of a scene segmentation algrothim to parse visual data. In addition to this we will be using a reccurrent neural-network to process inputs. The goal behind this is to have the A.I. plan its actions and learn from its guesses. 
+Our approach to creating this AI is to use a modular neural network. This neural network will use a combination of a scene segmentation algrothim to parse visual data. In addition to this we will be using a recurrent neural-network to process inputs. The goal behind this is to have the AI plan its actions and then learn from its guesses. 
 
 %-------------------------------------------%
 
@@ -39,7 +39,17 @@ Our approach to creating this A.I. is to use a modular neural network. This neur
 \section{Features}
 %-------------------------------------------%
 
-A brief overview of primary features you plan to implement.
+In order to play Rivals of Aether, one must use a set of controls containing a total of nine buttons, where five are for actions such as attacking or dodging and four are for movement.
+
+\begin{figure}
+	\caption{In-game menu displaying game controls}
+	\centering
+	\includegraphics[scale = 0.5]{controls.png} \\
+\end{figure}
+
+These buttons can be combined for different effects. An attack will undergo significant changes depending on if the attacking character is standing, walking, running, or jumping. Furthermore, tilting the control stick during the attack will effect additional changes. Dodging in the air is different from doing so on the ground, which is different still from dodging while moving the control stick in a direction.
+
+Due to the complex nature of the game's control scheme, at any given moment the AI will need to be able to output any combination of two simultaneous button presses, where one of the buttons is for movement and the other is for an action.
 
 %-------------------------------------------%
 
@@ -50,7 +60,7 @@ A brief overview of primary features you plan to implement.
 
 We have over 1,000 data points in the form of replay files. This dataset will be randomly distributed such that around eighty-percent goes into a training set, fifteen-percent into a testing set, and the remainder into a validation set.
 
-A training session will run as follows. The {\it SerpentAI} agent will traverse the game's menus to initiate playback of the next replay from a shuffled copy of the training set. While the match is simulated, the agent will simultaneously read the visual buffer from the game and control input data from the replay file. For each frame, the agent will pair the input data with its corresponding visual buffer and then send this bundle to a {\it TensorFlow} neural network as labels and data, respectively. The neural network will attempt to produce a set of appropriate control inputs in response and adjust its weights  whenever its prediction are incorrect. When playback has concluded, the agent will traverse the menus once again to start a new replay, repeatedly, until it has reached its quota. The total number of training iterations will vary between experiments until it produces satisfactory results.
+A training session will run as follows. The SerpentAI agent will traverse the game's menus to initiate playback of the next replay from a shuffled copy of the training set. While the match is simulated, the agent will simultaneously read the visual buffer from the game and control input data from the replay file. For each frame, the agent will pair the input data with its corresponding visual buffer and then send this bundle to a TensorFlow neural network as labels and data, respectively. The neural network will attempt to produce a set of appropriate control inputs in response and adjust its weights  whenever its prediction are incorrect. When playback has concluded, the agent will traverse the menus once again to start a new replay, repeatedly, until it has reached its quota. The total number of training iterations will vary between experiments until it produces satisfactory results.
 
 A properly trained neural network shall demonstrate several qualities other than a high accuracy when tested against the held back data. Firstly, it shall be able to defeat low-level in-game bots, thereby demonstrating its competence. This can be tested by placing the neural network in matches against bots of increasing difficulty, thereby enabling the assignment of numerical performance benchmarks. Secondly, it shall play in a believably-human manner. This means that it should, wherever possible, be discouraged from playing {\it inhumanly} well, getting stuck, or displaying mechanical tics. Examples of these undesirable behaviors would include, in order, executing nonstop frame-perfect moves throughout the course of an entire game, running off of the stage or standing still due to an as-of-yet unseen situation, or constantly changing direction for no reason while otherwise playing competently. Identifying all such behaviors will be difficult prior to live experiments, however.
 
@@ -61,6 +71,14 @@ A properly trained neural network shall demonstrate several qualities other than
 \section{Criteria and Constraints}
 %-------------------------------------------%
 
-Project development must meet desired needs within realistic constraints. Many times, constraints are interrelated. Cover the appropriate criteria and constraints related to your capstone. Some example criteria and constraints are health and safety, environmental, political, social, manufacturability, sustainability, economical, and ethical.
+Initial work on the neural network implementation is due to start on December 12, 2017, shortly after the conclusion of the 2017 Fall Semester. This work should be concluded by mid-March. From there, about two weeks are allocated for finalizing the design document. Overall, the schedule is intentionally tight in order to emphasize getting most of the work done in the beginning of the semester, thereby maximizing flex time and minimizing the competition between this project and other finals.
+
+\begin{figure}
+	\caption{Gantt chart}
+	\centering
+	\includegraphics[scale = 0.6]{gantt.png} \\
+\end{figure}
+
+The project has other constraints in addition to its schedule. The dataset was collected from the community with the promise that each replay file we receive will be treated as private data and not, under any circumstances, be redistributed. Thus, care shall be taken to ensure that no replay files from the community are leaked. At the same time, however, these files must not be lost due to accidental deletion, disk failure, or lack of backup. To address these requirements, multiple redundant copies of the dataset are stored on our own local drives as well as via encrypted, private, cloud storage services such as Google Drive. Only the dozen or so replay files that we brought to the dataset ourselves will be stored publicly on the GitHub repository.
 
 %-------------------------------------------%
