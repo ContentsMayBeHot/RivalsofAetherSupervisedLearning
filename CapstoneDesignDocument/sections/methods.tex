@@ -28,7 +28,9 @@ All experiments will take place on a pair of 64-bit Windows 10 machines with Ubu
 \section{Algorithms}
 %-------------------------------------------%
 
-Our approach to creating this AI is to use a modular neural network. This neural network will use a combination of a scene segmentation algrothim to parse visual data. In addition to this we will be using a recurrent neural network to process inputs. The goal behind this is to have the AI plan its actions and then learn from its guesses. 
+Our approach to creating this AI is to use a modular multi-layer recurrent neural network. One of the modules will parse the visual buffer using either scene segmentation or a autoencoder, depending on which of these techniques yields better results. The goal is to have the AI plan its actions and then learn from its guesses by using the recurrent neural network model. Furthermore, it will be able to understand more abstract qualities of the visual buffer by using its multiple layers.
+
+The specific RNN model we use will change as we experiment. Training shall be achieved using gradient descent.
 
 %-------------------------------------------%
 
