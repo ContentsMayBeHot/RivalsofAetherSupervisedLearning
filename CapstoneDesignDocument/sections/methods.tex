@@ -4,6 +4,8 @@
 \section{Design}
 %-------------------------------------------%
 
+Our game agent will use the SerpentAI API to retrieve the frame buffer from the game's runtime. This buffer will then be passed to our TensorFlow neural network via Keras. The neural network will interpret the frame buffer and then produce an output consisting of up to two simultaneous button presses, which will get passed all the way back along the chain to the game runtime. Through all of this, SerpentAI will be making frequent use of a Redis database as well as modules provided by Anaconda. Also, TensorFlow will utilize the GPU for its computations using the CUDA toolkit.
+
 \begin{figure}
 	\caption{Data flow within our software stack}
 	\centering
@@ -12,15 +14,12 @@
 
 %-------------------------------------------%
 
-
 \section{Frameworks}
 %-------------------------------------------%
 
-Our project uses a software stack comprised of the following modules and libraries: {\it SerpentAI}, {\it Keras}, {\it TensorFlow}, and the {\it Anaconda Distribution} for Python 3.
+Our project uses a software stack comprised of the following modules and libraries: SerpentAI, Keras, TensorFlow, and the Anaconda Distribution for Python 3. We chose to use Python 3 as our primary programming language for its flexibility, intuitive syntax, and data processing capabilities. Python is also helpfully compatible with all of the other software listed above. Furthermore, the {\it Anaconda distribution} provides us with a large assortment of Python modules, some of which {\it SerpentAI} cites as dependencies \cite{SerpentAI}. This allows us to more easily work from within a Windows environment, which in turn gives us the most straightforward and stable access to GPU computation via NVIDIA proprietary drivers. TensorFlow serves as the project's backbone by actually creating the neural network in addition to performing the necessary computations \cite{TensorFlow}, with Keras allowing us to perform rapid prototyping in TensorFlow via its abstracted API \cite{Keras}.
 
-We chose to use Python 3 as our primary programming language for its flexibility, intuitive syntax, and data processing capabilities. Python is also helpfully compatible with all of the other software listed above. Furthermore, the {\it Anaconda distribution} provides us with a large assortment of Python modules, some of which {\it SerpentAI} cites as dependencies \cite{SerpentAI}. This allows us to more easily work from within a Windows environment, which in turn gives us the most straightforward and stable access to GPU computation via NVIDIA proprietary drivers.
-
-We have opted to use our own personal computers running 64-bit Windows 10 with Ubuntu subsystems as both our platform and development environment. There are several reasons to justify this decision. Firstly, we wanted to ensure that we would have the best possible experience when dealing with GPU computation, and NVIDIA simply has a longer and better track record for supporting Windows than it does for Linux. Secondly, we wanted to avoid the potential pitfall of our platform restricting us to a smaller library of target games. Our two top candidates were {\it Quake} and {\it Rivals of Aether} because both of these games support replays, or demos; however, of those two games, only {\it Quake} natively supports Linux, and ultimately we selected {\it Rivals of Aether}. Lastly, and with regards to using our own computers for both development and testing, we made the decision to abstain from distributed or cloud computing chiefly to save costs, but also as an aesthetic choice based in the desire to see what our computers are capable of. Despite all of the above justifications for using Windows, it remains to be said that our project cannot live without Linux. {\it SerpentAI} requires a Redis database, so in order for that to work we use an Ubuntu subsystem; this is the official recommendation from the {\it SerpentAI} developers \cite{SerpentAI}.
+All experiments will take place on a pair of 64-bit Windows 10 machines with Ubuntu subsystems. There are several reasons to justify this decision. Firstly, we wanted to ensure that we would have the best possible experience when dealing with GPU computation, and NVIDIA simply has a longer and better track record for supporting Windows than it does for Linux. Secondly, we wanted to avoid the potential pitfall of our platform restricting us to a smaller library of target games. Our two top candidates were Quake and Rivals of Aether because both of these games support replays, or demos; however, of those two games, only Quake natively supports Linux, and ultimately we selected Rivals of Aether. Lastly, and with regards to using our own computers for both development and testing: we made the decision to abstain from distributed or cloud computing chiefly to save costs, but also as an aesthetic choice based in our desire to push our own hardware to its absolute limits. Despite all of the above justifications for using Windows, it remains to be said that our project cannot live without Linux. SerpentAI requires a Redis database, so in order for that to work we use an Ubuntu subsystem; this is the official recommendation from the SerpentAI developers \cite{SerpentAI}.
 
 %-------------------------------------------%
 
@@ -29,8 +28,7 @@ We have opted to use our own personal computers running 64-bit Windows 10 with U
 \section{Algorithms}
 %-------------------------------------------%
 
-
-Our approach to creating this AI is to use a modular neural network. This neural network will use a combination of a scene segmentation algrothim to parse visual data. In addition to this we will be using a recurrent neural-network to process inputs. The goal behind this is to have the AI plan its actions and then learn from its guesses. 
+Our approach to creating this AI is to use a modular neural network. This neural network will use a combination of a scene segmentation algrothim to parse visual data. In addition to this we will be using a recurrent neural network to process inputs. The goal behind this is to have the AI plan its actions and then learn from its guesses. 
 
 %-------------------------------------------%
 
@@ -76,9 +74,11 @@ Initial work on the neural network implementation is due to start on December 12
 \begin{figure}
 	\caption{Gantt chart}
 	\centering
-	\includegraphics[scale = 0.6]{gantt.png} \\
+	\includegraphics[scale = 0.5]{gantt.png} \\
 \end{figure}
 
-The project has other constraints in addition to its schedule. The dataset was collected from the community with the promise that each replay file we receive will be treated as private data and not, under any circumstances, be redistributed. Thus, care shall be taken to ensure that no replay files from the community are leaked. At the same time, however, these files must not be lost due to accidental deletion, disk failure, or lack of backup. To address these requirements, multiple redundant copies of the dataset are stored on our own local drives as well as via encrypted, private, cloud storage services such as Google Drive. Only the dozen or so replay files that we brought to the dataset ourselves will be stored publicly on the GitHub repository.
+The project has other constraints in addition to its schedule. The dataset was collected from the community with the promise that each replay file we receive will be treated as private data and not, under any circumstances, be redistributed. Thus, care shall be taken to ensure that no replay files from the community are leaked. At the same time, however, these files must not be lost due to accidental deletion, disk failure, or lack of backup. To address these requirements, multiple redundant copies of the dataset are stored on our own local drives as well as via encrypted, private, cloud storage services such as Google Drive. Only the dozen or so replay files that we brought to the dataset ourselves may be stored publicly on the GitHub repository.
+
+Our experiments will be deemed adequately successful if we can produce AI that beat the in-built bots on lowest difficulty levels. This is considered a baseline that we will attempt to surpass through improvements to the neural network and additional training.
 
 %-------------------------------------------%
