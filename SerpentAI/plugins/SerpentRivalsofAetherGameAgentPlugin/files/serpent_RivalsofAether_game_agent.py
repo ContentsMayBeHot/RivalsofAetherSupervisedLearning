@@ -7,9 +7,14 @@ from serpent.input_controller import KeyboardKey
 class SerpentRivalsofAetherGameAgent(GameAgent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.frame_handlers['TRAIN'] = self.handle_train
         self.frame_handlers["PLAY"] = self.handle_play
         self.frame_handler_setups["PLAY"] = self.setup_play
+        self.frame_handler_setups['TRAIN'] = self.setup_train
         self.analytics_client = None
+
+    def setup_train(self):
+        pass
 
     def setup_play(self):
         input_mapping = {
@@ -42,3 +47,6 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
                 game_frame.frame.shape,
                 str(i)
             )
+
+    def handle_train(self):
+        pass
