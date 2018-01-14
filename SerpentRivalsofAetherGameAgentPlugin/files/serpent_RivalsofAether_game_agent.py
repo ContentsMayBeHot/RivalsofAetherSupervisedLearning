@@ -4,17 +4,15 @@ from serpent.input_controller import KeyboardKey
 from serpent.frame_grabber import FrameGrabber
 from serpent.input_controller import KeyboardKey
 
+import keras
+from os import path, sep
+
 class SerpentRivalsofAetherGameAgent(GameAgent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.frame_handlers['TRAIN'] = self.handle_train
         self.frame_handlers["PLAY"] = self.handle_play
         self.frame_handler_setups["PLAY"] = self.setup_play
-        self.frame_handler_setups['TRAIN'] = self.setup_train
         self.analytics_client = None
-
-    def setup_train(self):
-        pass
 
     def setup_play(self):
         input_mapping = {
@@ -28,7 +26,7 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
             'LEFT': [KeyboardKey.KEY_LEFT],
             'RIGHT': [KeyboardKey.KEY_RIGHT]
         }
-        key_mapping = {
+        self.key_mapping = {
             KeyboardKey.KEY_Z.name: 'JUMP',
             KeyboardKey.KEY_X.name: 'ATTACK',
             KeyboardKey.KEY_C.name: 'SPECIAL',
@@ -48,5 +46,6 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
                 str(i)
             )
 
-    def handle_train(self):
-        pass
+    def open_replay(self, name)
+        replays = 'Users\\matth\\AppData\\Local\\RivalsofAether\\replays'
+        fin = open(path.join('c:', sep, replays, name + '.roa'), 'r')
