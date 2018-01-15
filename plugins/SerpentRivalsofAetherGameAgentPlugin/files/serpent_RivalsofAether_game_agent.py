@@ -45,7 +45,3 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
                 game_frame.frame.shape,
                 str(i)
             )
-
-    def open_replay(self, name)
-        replays = 'Users\\matth\\AppData\\Local\\RivalsofAether\\replays'
-        fin = open(path.join('c:', sep, replays, name + '.roa'), 'r')
