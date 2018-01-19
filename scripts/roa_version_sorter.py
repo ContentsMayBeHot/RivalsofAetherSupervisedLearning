@@ -1,8 +1,7 @@
 ''' roa_version_sorter.py
 Author: Matthew James Harrison
 Modified: 1/19/2018
-Description: Sorts roa files into folders according to game version. Simply
-place in the directory with all of your roa files and run!
+Description: Sorts roa files into folders according to game version.
 '''
 
 import os
