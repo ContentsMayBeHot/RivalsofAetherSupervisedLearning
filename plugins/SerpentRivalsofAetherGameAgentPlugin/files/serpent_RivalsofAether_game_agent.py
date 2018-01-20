@@ -4,8 +4,15 @@ from serpent.input_controller import KeyboardKey
 from serpent.frame_grabber import FrameGrabber
 from serpent.input_controller import KeyboardKey
 
-import keras
-from os import path, sep
+import os
+
+class ReplayManager:
+    def __init__(self, version):
+        self.version = version
+        self.batch = []
+        for dirent in os.listdir(version):
+            if dirent.endswith('.roa'):
+                self.batch.append(dirent)
 
 class SerpentRivalsofAetherGameAgent(GameAgent):
     def __init__(self, **kwargs):
@@ -45,3 +52,4 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
                 game_frame.frame.shape,
                 str(i)
             )
+        game_frame_buffer
