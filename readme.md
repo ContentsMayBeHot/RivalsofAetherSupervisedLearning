@@ -24,7 +24,7 @@ Install all dependencies listed above. Please refer to their respective installa
 
 After setting up SerpentAI, it is recommended that you use the mklink command create a symbolic link from {path to SerpentAI}\plugins to {path to repository}\plugins; this will allow you to keep the plugins up to date without having to manually copy any files.
 
-Also, you will need to add the following to [path to repository]\scripts\roa.ini:
+Also, you will need to add the following to {path to repository}\scripts\roa.ini:
 
 ```
 [RivalsofAether]
