@@ -4,21 +4,18 @@ Modified: 1/19/2018
 Description: Sorts roa files into folders according to game version.
 '''
 
-import os
 import configparser
+import os
 
 if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read('roa.ini')
-    if 'RivalsofAether' not in config.sections():
-        print('Failed to retrieve path to replays from roa.ini')
-        quit()
     fq_replays = config['RivalsofAether']['PathToReplays']
 
     print('Using path:', fq_replays)
     for dirent in os.listdir(fq_replays):
         # Open the next replay file
-        if len(dirent) < 5 or dirent[-4:] != '.roa':
+        if not dirent.endswith('.roa'):
             continue
         fq_dirent = os.path.join(fq_replays, dirent)
         with open(fq_dirent) as fin:
