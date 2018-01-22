@@ -20,6 +20,12 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
         self.frame_handlers["PLAY"] = self.handle_play
         self.frame_handler_setups["PLAY"] = self.setup_play
         self.analytics_client = None
+        # Source: https://stackoverflow.com/a/3220762
+        # The game agent will be run from SerpentAI\plugins. However, it needs
+        # to be able to access roa.ini, which is located in capstone\plugins.
+        cwd = os.getcwd()
+        self.real_path = os.path.normpath(os.path.join(os.path.dirname(cwd),
+                                                       os.readlink(cwd)))
 
     def setup_play(self):
         input_mapping = {
