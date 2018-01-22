@@ -8,12 +8,27 @@ import configparser
 import os
 
 class ReplayManager:
-    def __init__(self, version):
-        self.version = version
-        self.batch = []
-        for dirent in os.listdir(version):
-            if dirent.endswith('.roa'):
-                self.batch.append(dirent)
+    batches = [
+        '01_00_02',
+        '01_00_03',
+        '01_00_05',
+        '01_01_02',
+        '01_02_01',
+        '01_02_02'
+    ]
+    def __init__(self, n_batch):
+        # Source: https://stackoverflow.com/a/3220762
+        # The game agent will be run from SerpentAI\plugins. However, it needs
+        # to be able to access roa.ini, which is located in capstone\plugins.
+        fq_plugins = os.path.join(os.path.dirname('..'), os.readlink('..'))
+        fq_ini = os.path.join(fq_plugins, '..', 'scripts', 'roa.ini')
+        config = configparser.ConfigParser()
+        config.read(fq_ini)
+        self.fq_replays = config['RivalsofAether']['PathToReplays']
+        self.fq_batch = os.path.join(self.fq_replays, n_batch)
+        self.batch = [
+            x for x in os.listdir(self.fq_batch) if x.endswith('.roa')
+            ]
 
 class SerpentRivalsofAetherGameAgent(GameAgent):
     def __init__(self, **kwargs):
@@ -23,15 +38,6 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
         self.analytics_client = None
 
     def setup_play(self):
-        # Source: https://stackoverflow.com/a/3220762
-        # The game agent will be run from SerpentAI\plugins. However, it needs
-        # to be able to access roa.ini, which is located in capstone\plugins.
-        plugins = os.path.join(os.path.dirname('..'), os.readlink('..'))
-        ini_path = os.path.join(plugins, '..', 'scripts', 'roa.ini')
-        config = configparser.ConfigParser()
-        config.read(ini_path)
-        self.fq_replays = config['RivalsofAether']['PathToReplays']
-
         input_mapping = {
             'Z': [KeyboardKey.KEY_Z],
             'X': [KeyboardKey.KEY_X],
