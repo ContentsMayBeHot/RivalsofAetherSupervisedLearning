@@ -8,7 +8,7 @@ import configparser
 import os
 
 class ReplayManager:
-    batches = [
+    all_batch_names = [
         '01_00_02',
         '01_00_03',
         '01_00_05',
@@ -16,18 +16,20 @@ class ReplayManager:
         '01_02_01',
         '01_02_02'
     ]
-    def __init__(self, n_batch):
+    def __init__(self, batch_name):
         # Source: https://stackoverflow.com/a/3220762
         # The game agent will be run from SerpentAI\plugins. However, it needs
         # to be able to access roa.ini, which is located in capstone\plugins.
-        fq_plugins = os.path.join(os.path.dirname('..'), os.readlink('..'))
-        fq_ini = os.path.join(fq_plugins, '..', 'scripts', 'roa.ini')
+        path_to_plugins = os.path.join(os.path.dirname('..'), os.readlink('..'))
+        path_to_ini = os.path.join(path_to_plugins, '..', 'scripts', 'roa.ini')
         config = configparser.ConfigParser()
         config.read(fq_ini)
-        self.fq_replays = config['RivalsofAether']['PathToReplays']
-        self.fq_batch = os.path.join(self.fq_replays, n_batch)
+
+        self.path_to_replays = config['RivalsofAether']['PathToReplays']
+        self.path_to_batch = os.path.join(self.path_to_replays, batch_name)
         self.batch = [
-            x for x in os.listdir(self.fq_batch) if x.endswith('.roa')
+            dirent for dirent in os.listdir(self.path_to_batch)
+            if dirent.endswith('.roa')
             ]
 
 class SerpentRivalsofAetherGameAgent(GameAgent):
