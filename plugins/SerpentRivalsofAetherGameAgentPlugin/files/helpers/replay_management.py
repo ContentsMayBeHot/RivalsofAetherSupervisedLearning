@@ -1,18 +1,12 @@
 import configparser
 import os
+import random
+import re
 import shutil
 
 
 class ReplayManager:
-    all_batch_names = [
-        '01_00_02',
-        '01_00_03',
-        '01_00_05',
-        '01_01_02',
-        '01_02_01',
-        '01_02_02'
-    ]
-    def __init__(self, batch_name):
+    def __init__(self):
         # Source: https://stackoverflow.com/a/3220762
         # The game agent will be run from SerpentAI\plugins. However, it needs
         # to be able to access roa.ini, which is located in capstone\plugins.
@@ -20,14 +14,27 @@ class ReplayManager:
         ini_path = os.path.join(plugins_path, '..', 'scripts', 'roa.ini')
         config = configparser.ConfigParser()
         config.read(ini_path)
-
         self.replays_path = config['RivalsofAether']['PathToReplays']
+        self.all_batch_names = [
+            x for x in os.listdir(self.replays_path) if x.
+        ]
+        p = re.compile('[0-9]{2}_[0-9]{2}_[0-9]{2}')
+        self.valid_batch_names = [x for x in os.listdir() if p.match(x)]
+
+    def set_batch(self, batch_name):
         self.batch_path = os.path.join(self.replays_path, batch_name)
         self.batch = [
             dirent for dirent in os.listdir(self.batch_path)
             if dirent.endswith('.roa')
             ]
+        self.batch_unvisited = self.batch
+        self.batch_visited = []
         self.current_replay = None
+
+    def select_random_replay(self):
+        next_replay_name = random.choice(self.batch_unvisited)
+        self.replace_current_replay(next_replay_name)
+        return self.read_current_replay()
 
     def read_current_replay(self):
         current_replay_path = os.path.join(self.replays_path,
@@ -46,6 +53,7 @@ class ReplayManager:
     def replace_current_replay(self, target_replay_name):
         self.current_replay = target_replay_name
         # Remove any existing replay files from the game's replays folder
+        # Only one is allowed at a time because that's easier to deal with
         for dirent in os.listdir(self.replays_path):
             if dirent.endswith('.roa'):
                 dirent_path = os.path.join(self.replays_path, dirent)
@@ -53,3 +61,6 @@ class ReplayManager:
         # Copy the specified replay file to the game's replays folder
         target_replay_path = os.path.join(self.batch_path, replay_name)
         shutil.copy(target_replay_path, self.replays_path)
+        # Update the batch trackers
+        self.batch_visited.append(target_replay_name)
+        self.batch_unvisited.remove(target_replay_name)
