@@ -51,6 +51,7 @@ class Player:
         self.actions = []
 
 
+
 class ReplayManager:
     def __init__(self):
         # Source: https://stackoverflow.com/a/3220762
