@@ -30,6 +30,19 @@ class Character(enum.Enum):
     CLAIREN = 12
 
 
+class Replay:
+    def __init__(self, replay_file):
+        self.name = replay_file.name
+        metadata = replay.readline()
+        settings = replay.readlin()
+        players = []
+        for i in range(4):
+            player_data = fin.readline()
+            player_inputs = fin.readline()
+            if player[0] is 'H':
+                players.append((player_data, player_inputs))
+
+
 class ReplayManager:
     def __init__(self):
         # Source: https://stackoverflow.com/a/3220762
@@ -67,15 +80,7 @@ class ReplayManager:
         current_replay_path = os.path.join(self.replays_path,
                                            self.current_replay)
         with open(current_replay_path, 'r') as fin:
-            replay_metadata = fin.readline()
-            match_settings = fin.readline()
-            players = []
-            for i in range(4):
-                player_data = fin.readline()
-                player_inputs = fin.readline()
-                if player[0] is 'H':
-                    players.append((player_data, player_inputs))
-        return (replay_metadata, match_settings, players)
+            return Replay(fin)
 
     def replace_current_replay(self, target_replay_name):
         self.current_replay = target_replay_name
