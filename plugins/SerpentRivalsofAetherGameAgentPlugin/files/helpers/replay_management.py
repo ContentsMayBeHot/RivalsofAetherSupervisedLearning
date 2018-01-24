@@ -5,6 +5,8 @@ import random
 import re
 import shutil
 
+import numpy as np
+
 
 class Stage(enum.Enum):
     TREETOP_LODGE = 1
@@ -15,9 +17,11 @@ class Stage(enum.Enum):
     BLAZING_HIDEOUT = 7
     TOWER_OF_HEAVEN = 8
 
+
 class StageMode(enum.Enum):
     BASIC = 0
     AETHER = 1
+
 
 class Character(enum.Enum):
     ZETTERBURN = 2
@@ -33,6 +37,12 @@ class Character(enum.Enum):
     CLAIREN = 12
 
 
+class Player:
+    def __init__(self, alias):
+        self.alias = alias
+        self.actions = []
+
+
 class Replay:
     def __init__(self, replay_file):
         self.name = replay_file.name
@@ -45,19 +55,23 @@ class Replay:
             if player[0] is 'H':
                 players.append((player_data, player_inputs))
 
-class Player:
-    def __init__(self, alias):
-        self.alias = alias
-        self.actions = []
+
+def get_version_names(replays_path):
+    p = re.compile('[0-9]{2}_[0-9]{2}_[0-9]{2}')
+    return [ x for x in os.listdir(replays_path) if p.match(x) ]
 
 
 class ReplayManager:
-    def __init__(self):
+    def __init__(self, version_name):
         self.replays_path = self.__get_replays_path()
-        p = re.compile('[0-9]{2}_[0-9]{2}_[0-9]{2}')
-        self.all_batch_names = [
-            x for x in os.listdir(self.replays_path) if p.match(x)
-        ]
+        self.version_path = os.path.join(self.replays_path, batch_name)
+        self.batch = [
+            dirent for dirent in os.listdir(self.version_path)
+            if dirent.endswith('.roa')
+            ]
+        self.batch_unvisited = self.batch
+        self.batch_visited = []
+        self.current_replay = None
 
     def __get_replays_path(self):
         # Source: https://stackoverflow.com/a/3220762
@@ -70,16 +84,6 @@ class ReplayManager:
         config = configparser.ConfigParser()
         config.read(ini_path)
         return config['RivalsofAether']['PathToReplays']
-
-    def set_batch(self, batch_name):
-        self.version_path = os.path.join(self.replays_path, batch_name)
-        self.batch_all = [
-            dirent for dirent in os.listdir(self.version_path)
-            if dirent.endswith('.roa')
-            ]
-        self.batch_unvisited = self.batch_all
-        self.batch_visited = []
-        self.current_replay = None
 
     def select_random_replay(self):
         next_replay_name = random.choice(self.batch_unvisited)
