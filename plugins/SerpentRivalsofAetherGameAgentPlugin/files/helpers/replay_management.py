@@ -35,7 +35,9 @@ class ReplayManager:
         # Source: https://stackoverflow.com/a/3220762
         # The game agent will be run from SerpentAI\plugins. However, it needs
         # to be able to access roa.ini, which is located in capstone\plugins.
-        plugins_path = os.path.join(os.path.dirname('..'), os.readlink('..'))
+        plugins_path_relative = os.path.join('..', '..', '..')
+        plugins_path = os.path.join(os.path.dirname(plugins_path_relative),
+                                    os.readlink(plugins_path_relative))
         ini_path = os.path.join(plugins_path, '..', 'scripts', 'roa.ini')
         config = configparser.ConfigParser()
         config.read(ini_path)
