@@ -32,7 +32,18 @@ class Character(enum.Enum):
     RANNO = 11
     CLAIREN = 12
 
+class Replay:
+    def __init__(self):
+        actions = []
 
+    def add_action(self, action):
+        self.actions.append(action)
+
+    def get_action(self):
+        if(self.actions):
+            return None
+        else:
+            return self.actions.pop(0)
 class ReplayManager:
     def __init__(self):
         # Source: https://stackoverflow.com/a/3220762
