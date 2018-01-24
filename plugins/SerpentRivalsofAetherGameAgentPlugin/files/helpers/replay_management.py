@@ -15,6 +15,9 @@ class Stage(enum.Enum):
     BLAZING_HIDEOUT = 7
     TOWER_OF_HEAVEN = 8
 
+class StageMode(enum.Enum):
+    BASIC = 0
+    AETHER = 1
 
 class Character(enum.Enum):
     ZETTERBURN = 2
