@@ -1,8 +1,33 @@
 import configparser
+import enum
 import os
 import random
 import re
 import shutil
+
+
+class Stage(enum.Enum):
+    TREETOP_LODGE = 1
+    FIRE_CAPITOL = 2
+    AIR_ARMADA = 3
+    ROCK_WALL = 4
+    MERCHANT_PORT = 5
+    BLAZING_HIDEOUT = 7
+    TOWER_OF_HEAVEN = 8
+
+
+class Character(enum.Enum):
+    ZETTERBURN = 2
+    ORCANE = 3
+    WRASTOR = 4
+    KRAGG = 5
+    FORSBURN = 6
+    MAYPUL = 7
+    ABSA = 8
+    ETALUS = 9
+    ORI = 10
+    RANNO = 11
+    CLAIREN = 12
 
 
 class ReplayManager:
