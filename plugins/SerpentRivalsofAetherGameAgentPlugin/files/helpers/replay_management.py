@@ -32,20 +32,7 @@ class Character(enum.Enum):
     RANNO = 11
     CLAIREN = 12
 
-class Replay:
-    def __init__(self):
-        actions = []
 
-    def add_action(self, action):
-        self.actions.append(action)
-
-<<<<<<< HEAD
-    def get_action(self):
-        if(self.actions):
-            return None
-        else:
-            return self.actions.pop(0)
-=======
 class Replay:
     def __init__(self, replay_file):
         self.name = replay_file.name
@@ -58,8 +45,12 @@ class Replay:
             if player[0] is 'H':
                 players.append((player_data, player_inputs))
 
+class Player:
+    def __init__(self, alias):
+        self.alias = alias
+        self.actions = []
 
->>>>>>> f5fcb00f5a9c8cc50929ef75f4080d2a9b760dbf
+
 class ReplayManager:
     def __init__(self):
         # Source: https://stackoverflow.com/a/3220762
