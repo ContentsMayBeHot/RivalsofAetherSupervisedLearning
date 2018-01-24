@@ -39,11 +39,27 @@ class Replay:
     def add_action(self, action):
         self.actions.append(action)
 
+<<<<<<< HEAD
     def get_action(self):
         if(self.actions):
             return None
         else:
             return self.actions.pop(0)
+=======
+class Replay:
+    def __init__(self, replay_file):
+        self.name = replay_file.name
+        metadata = replay.readline()
+        settings = replay.readlin()
+        players = []
+        for i in range(4):
+            player_data = fin.readline()
+            player_inputs = fin.readline()
+            if player[0] is 'H':
+                players.append((player_data, player_inputs))
+
+
+>>>>>>> f5fcb00f5a9c8cc50929ef75f4080d2a9b760dbf
 class ReplayManager:
     def __init__(self):
         # Source: https://stackoverflow.com/a/3220762
@@ -81,15 +97,7 @@ class ReplayManager:
         current_replay_path = os.path.join(self.replays_path,
                                            self.current_replay)
         with open(current_replay_path, 'r') as fin:
-            replay_metadata = fin.readline()
-            match_settings = fin.readline()
-            players = []
-            for i in range(4):
-                player_data = fin.readline()
-                player_inputs = fin.readline()
-                if player[0] is 'H':
-                    players.append((player_data, player_inputs))
-        return (replay_metadata, match_settings, players)
+            return Replay(fin)
 
     def replace_current_replay(self, target_replay_name):
         self.current_replay = target_replay_name
