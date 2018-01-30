@@ -61,17 +61,29 @@ def get_version_names(replays_path):
     return [ x for x in os.listdir(replays_path) if p.match(x) ]
 
 
-class ReplayManager:
+class ReplayBatch:
+    def __init__(self, batch=[]):
+        self.unvisited = batch
+        self.visited = []
+
+    def get_next(self):
+        replay = random.choice(self.unvisited)
+        self.unvisited.remove(replay)
+        self.visited.append(replay)
+        return replay
+
+
+class ReplayBatchManager:
     def __init__(self, version_name):
         self.replays_path = self.__get_replays_path()
         self.version_path = os.path.join(self.replays_path, batch_name)
-        self.batch = [
+        self.dataset = [
             dirent for dirent in os.listdir(self.version_path)
             if dirent.endswith('.roa')
             ]
-        self.batch_unvisited = self.batch
-        self.batch_visited = []
-        self.current_replay = None
+        self.training_set = Batch()
+        self.testing_set = Batch()
+        self.validating_set = Batch()
 
     def __get_replays_path(self):
         # Source: https://stackoverflow.com/a/3220762
