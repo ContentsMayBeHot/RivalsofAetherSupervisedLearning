@@ -4,17 +4,17 @@ from serpent.input_controller import KeyboardKey
 from serpent.frame_grabber import FrameGrabber
 from serpent.input_controller import KeyboardKey
 
-from .helpers.replay_management import ReplayManager
+from .helpers.replay_management import ReplayBatchManager
+
+from datetime import datetime, time
 
 class SerpentRivalsofAetherGameAgent(GameAgent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.frame_handlers["PLAY"] = self.handle_play
-        self.frame_handlers["TRAIN"] = self.handle_train
-        self.frame_handlers["DEBUG"] = self.handle_debug
+        self.frame_handlers["COLLECT"] = self.handle_collect
         self.frame_handler_setups["PLAY"] = self.setup_play
-        self.frame_handler_setups["TRAIN"] = self.setup_train
-        self.frame_handler_setups["DEBUG"] = self.setup_debug
+        self.frame_handler_setups["COLLECT"] = self.setup_collect
         self.analytics_client = None
 
     def setup_play(self):
@@ -41,23 +41,11 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
             KeyboardKey.KEY_RIGHT.name: 'RIGHT'
         }
 
-    def setup_train(self):
-        pass
-
-    def setup_debug(self):
+    def setup_collect(self):
         pass
 
     def handle_play(self, game_frame):
-        pass
+        print('Hellow')
 
-    def handle_train(self, game_frame):
-        pass
-
-    def handle_debug(self, game_frame):
-        for i, game_frame in enumerate(self.game_frame_buffer.frames):
-            self.visual_debugger.store_image_data(
-                game_frame.frame,
-                game_frame.frame.shape,
-                str(i)
-            )
-        game_frame_buffer
+    def handle_collect(self, game_frame):
+        print('HellOwO')

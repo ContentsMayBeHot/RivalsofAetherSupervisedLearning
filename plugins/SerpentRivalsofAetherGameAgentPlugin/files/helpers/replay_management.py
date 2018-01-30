@@ -61,19 +61,7 @@ def get_version_names(replays_path):
     return [ x for x in os.listdir(replays_path) if p.match(x) ]
 
 
-class ReplayBatch:
-    def __init__(self, batch=[]):
-        self.unvisited = batch
-        self.visited = []
-
-    def get_next(self):
-        replay = random.choice(self.unvisited)
-        self.unvisited.remove(replay)
-        self.visited.append(replay)
-        return replay
-
-
-class ReplayBatchManager:
+class ReplayManager:
     def __init__(self, version_name):
         self.replays_path = self.__get_replays_path()
         self.version_path = os.path.join(self.replays_path, batch_name)
@@ -122,3 +110,22 @@ class ReplayBatchManager:
         # Update the batch trackers
         self.batch_visited.append(next_replay_name)
         self.batch_unvisited.remove(next_replay_name)
+
+
+# Reference: https://github.com/sorki/python-mnist/blob/master/mnist/loader.py
+class ReplayLoader:
+    def __init__(self, path):
+        self.path = path
+        self.test_frames = []
+        self.test_replays = []
+        self.train_frames = []
+        self.train_replays = []
+
+    def load(self, frames_path, replays_path):
+        
+
+    def load_testing(self):
+        return self.test_frames, self.test_replays
+
+    def load_training(self):
+        return self.train_frames, self.train_replays
