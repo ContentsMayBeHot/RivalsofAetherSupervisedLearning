@@ -43,7 +43,7 @@ class ReplayManager:
     def __init__(self, version_name):
         self.replays_path = util.get_replays_path()
         self.version_path = os.path.join(self.replays_path, batch_name)
-        
+
         self.dataset = [
             dirent for dirent in os.listdir(self.version_path)
             if dirent.endswith('.roa')
