@@ -3,7 +3,7 @@
 
 <h2>Setup</h2>
 
-<h3>Dependences</h3>
+<h3>Dependencies</h3>
 
 <h4>Required</h4>
 
