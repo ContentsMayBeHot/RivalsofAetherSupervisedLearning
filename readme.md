@@ -1,7 +1,7 @@
 
 <h1>Capstone Project: Supervised Learning in Rivals of Aether </h1>
 
-<h2>Setup Instructions</h2>
+<h2>Setup</h2>
 
 <h3>Dependences</h3>
 
@@ -32,3 +32,9 @@ PathToReplays = {path to your replays folder}
 ```
 
 You should be able to find your replays folder at the following location: C:\Users\{your user name}\AppData\Local\RivalsofAether\replays
+
+<h2>Usage</h2>
+
+Place all of your replay files inside of your replays folder; this is the the same folder that the game uses and that you provided a path to in the roa.ini file.
+
+Next, run the version sorter program in the scripts folder of the repository. This will result in all of your replays being moved to subdirectories named after game versions.
