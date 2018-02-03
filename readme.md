@@ -35,7 +35,7 @@ You should be able to find your replays folder at the following location: C:\Use
 
 <h2>Usage</h2>
 
-<h3>Dataset Management</h3>
+<h3>Preparing your dataset</h3>
 
 Place all of your replay files inside of your replays folder; this is the the same folder that the game uses and that you provided a path to in the roa.ini file.
 
