@@ -4,9 +4,7 @@ from serpent.input_controller import KeyboardKey
 from serpent.frame_grabber import FrameGrabber
 from serpent.input_controller import KeyboardKey
 
-#from .helpers.replay_management import ReplayManager, ReplayLoader
-#from .helpers.util import get_replays_path, get_version_names
-from .helpers.util import InputSequences as inseq
+from .helpers.replay_management import ReplayManager
 
 import datetime
 import time
@@ -50,15 +48,24 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
     def setup_collect(self):
         self.setup_common()
 
+        version_name = ReplayManager.read_replay_version()
+        self.replay_manager = ReplayManager(version_name)
+        self.game_state = 0
+
     def handle_play(self, game_frame):
         print('Hellow')
 
     def handle_collect(self, game_frame):
-        self.tap_sequence(inseq.splash_to_main)
-        self.tap_sequence(inseq.main_to_replay)
-        self.tap_sequence(inseq.start_replay_1)
-        print('Done')
-        quit()
+        if self.game_state is 0:
+            self.tap_sequence(InputSequence.splash_to_main)
+            self.tap_sequence(InputSequence.main_to_replay)
+            self.game_state = 1
+        elif self.game_state is 1:
+            self.replay_manager.get_next_replay(replay_name)
+            self.tap_sequence(InputSequence.start_replay_1)
+            self.game_state = 2
+        elif self.game_state is 2:
+            self.game_state = 1
 
     def tap_sequence(self, sequence, delay_override=None):
         # Must contain delay value and one input/wait token

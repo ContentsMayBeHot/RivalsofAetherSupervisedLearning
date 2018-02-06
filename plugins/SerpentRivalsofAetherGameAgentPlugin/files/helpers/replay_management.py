@@ -5,9 +5,8 @@ import random
 import re
 import shutil
 
-import util
 
-import numpy as np
+FRAMES_PER_SECOND = 60.0
 
 
 class Stage(enum.Enum):
@@ -39,9 +38,17 @@ class Character(enum.Enum):
     CLAIREN = 12
 
 
+class InputSequences:
+    splash_to_main = [1.5, 'Z', 'X', 'Z', 'Z', 'Z', 'Z']
+    main_to_replay = [0.5, 'DOWN', 'DOWN', 'DOWN', 'Z', 1, 'Z']
+    start_replay_1 = [1, 'Z', 'Z']
+    back_and_forth = [1, 'X', 'Z']
+
+
 class ReplayManager:
+    @classmethod
     def __init__(self, version_name):
-        self.replays_path = util.get_replays_path()
+        self.replays_path = ReplayManager.get_replays_path()
         self.version_path = os.path.join(self.replays_path, batch_name)
 
         self.dataset = [
@@ -51,12 +58,55 @@ class ReplayManager:
         self.dataset_unvisited = self.dataset
         self.dataset_visited = []
 
-    def select_replay(self, replay_name=None):
+    @staticmethod
+    def get_ini_path():
+        # Source: https://stackoverflow.com/a/3220762
+        # The game agent will be run from SerpentAI\plugins. However, it needs
+        # to be able to access roa.ini, which is located in capstone\plugins.
+        plugins_path_relative = os.path.join('..', '..', '..')
+        plugins_path = os.path.join(os.path.dirname(plugins_path_relative),
+                                    os.readlink(plugins_path_relative))
+        return os.path.join(plugins_path, '..', 'scripts', 'roa.ini')
+
+    @staticmethod
+    def read_replays_path(ini_path=None):
+        if not ini_path:
+            ini_path = get_ini_path()
+        config = configparser.ConfigParser()
+        config.read(ini_path)
+        return config['RivalsofAether']['PathToReplays']
+
+    @staticmethod
+    def read_replay_version(ini_path=None):
+        if not ini_path:
+            ini_path = get_ini_path()
+        config = configparser.ConfigParser()
+        config.read(ini_path)
+        return config['RivalsofAether']['GameVersion']
+
+    @staticmethod
+    def get_version_names(replays_path=None):
+        if not replays_path:
+            replays_path = get_replays_path()
+        p = re.compile('[0-9]{2}_[0-9]{2}_[0-9]{2}')
+        return [ x for x in os.listdir(replays_path) if p.match(x) ]
+
+    @classmethod
+    def get_random_replay(self, replay_name=None):
         if not replay_name:
             replay_name = random.choice(self.dataset_unvisited)
         self.replace_current_replay(next_replay_name)
         return next_replay_name
 
+    @classmethod
+    def get_next_replay(self):
+        if not self.dataset_unvisited:
+            return False
+        replay_name = self.unvisited[0]
+        self.replace_current_replay(replay_name)
+        return True
+
+    @classmethod
     def replace_current_replay(self, replay_name):
         self.current_replay = replay_name
         # Remove any existing replay files from the game's replays folder
