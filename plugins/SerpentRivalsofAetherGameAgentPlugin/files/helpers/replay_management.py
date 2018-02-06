@@ -47,16 +47,24 @@ class InputSequences:
 
 class ReplayManager:
     @classmethod
-    def __init__(self, version_name):
-        self.replays_path = ReplayManager.get_replays_path()
-        self.version_path = os.path.join(self.replays_path, batch_name)
+    def __init__(self):
+        self.replays_abspath = ReplayManager.get_replays_path()
+        self.config_abspath = ReplayManager.get_ini_path()
 
-        self.dataset = [
-            dirent for dirent in os.listdir(self.version_path)
+        self.subdataset_abspath = None
+        self.subdataset = None
+        self.subdataset_unvisited = None
+        self.subdataset_visited = None
+
+    def set_subdataset(self, subdataset_dname):
+        self.subdataset_abspath = os.path.join(self.replays_abspath,
+                                               subdataset_dname)
+        self.subdataset = [
+            dirent for dirent in os.listdir(self.subdataset_abspath)
             if dirent.endswith('.roa')
             ]
-        self.dataset_unvisited = self.dataset
-        self.dataset_visited = []
+        self.subdataset_unvisited = list(self.subdataset)
+        self.subdataset_visited = []
 
     @staticmethod
     def get_ini_path():
@@ -64,7 +72,7 @@ class ReplayManager:
         # The game agent will be run from SerpentAI\plugins. However, it needs
         # to be able to access roa.ini, which is located in capstone\plugins.
         plugins_path_relative = os.path.join('..', '..', '..')
-        plugins_path = os.path.join(os.path.dirname(plugins_path_relative),
+        plugins_path = os.path.join(os.path.dname(plugins_path_relative),
                                     os.readlink(plugins_path_relative))
         return os.path.join(plugins_path, '..', 'scripts', 'roa.ini')
 
@@ -99,48 +107,58 @@ class ReplayManager:
         return next_replay_name
 
     @classmethod
-    def get_next_replay(self):
+    def get_next_roa(self):
+        '''Replace current .roa file in replays folder with an unvisited one.'''
         if not self.dataset_unvisited:
-            return False
-        replay_name = self.unvisited[0]
-        self.replace_current_replay(replay_name)
-        return True
+            return None
+        roa_fname = self.subdataset_unvisited[0]
+
+        self.__flush_roas()
+        self.__move_roa_to_replays(roa_fname)
+        self.__visit(roa_fname)
+
+        return roa_fname
 
     @classmethod
-    def replace_current_replay(self, replay_name):
-        self.current_replay = replay_name
-        # Remove any existing replay files from the game's replays folder
-        # Only one is allowed at a time because that's easier to deal with
-        for dirent in os.listdir(self.replays_path):
+    def __flush_roas(self):
+        ''' Remove all .roa files from the replays folder.'''
+        for dirent in os.listdir(self.replays_abspath):
             if dirent.endswith('.roa'):
-                dirent_path = os.path.join(self.replays_path, dirent)
+                dirent_path = os.path.join(self.replays_abspath, dirent)
                 os.remove(dirent_path)
+
+    @classmethod
+    def __move_roa_to_replays(self, roa_fname):
+        '''Copy specified .roa file from subdataset folder to replays folder.'''
         # Copy the specified replay file to the game's replays folder
-        target_replay_path = os.path.join(self.version_path, replay_name)
-        shutil.copy(target_replay_path, self.replays_path)
-        # Update the visited tracker
-        self.dataset_visited.append(replay_name)
-        self.dataset_unvisited.remove(replay_name)
+        roa_abspath = os.path.join(self.subdataset_abspath, roa_fname)
+        shutil.copy(roa_abspath, self.replays_abspath)
+
+    @classmethod
+    def __visit_roa(self, roa_fname):
+        '''Mark specified .roa file as visited.'''
+        self.dataset_visited.append(roa_fnameroa_fname)
+        self.dataset_unvisited.remove(roa_fname)
 
 
 # Reference: https://github.com/sorki/python-mnist/blob/master/mnist/loader.py
 class ReplayLoader:
-    def __init__(self, path='.'):
-        self.path = path
-        self.test_path = os.path.join(path, 'test')
-        self.train_path = os.path.join(path, 'train')
+    def __init__(self, replays_abspath='.'):
+        self.replays_abspath = replays_abspath
+        self.testing_dname = 'testing'
+        self.training_dname = 'training'
 
-        self.test_frames = []
-        self.train_frames = []
+        self.testing_x = []
+        self.testing_y = []
 
-        self.test_replays = []
-        self.train_replays = []
+        self.training_x = []
+        self.training_y = []
 
-    def load(self, frames_path, replays_path):
+    def load(self, x_abspath, y_abspath):
         pass
 
     def load_testing(self):
-        return self.test_frames, self.test_replays
+        return self.testing_x, self.testing_y
 
     def load_training(self):
-        return self.train_frames, self.train_replays
+        return self.training_x, self.training_y
