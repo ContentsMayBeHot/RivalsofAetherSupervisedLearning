@@ -6,44 +6,41 @@ import re
 import shutil
 
 
-FRAMES_PER_SECOND = 60.0
-SUBDATASET_PATTERN = re.compile('[0-9]{2}_[0-9]{2}_[0-9]{2}')
+class GameHelper:
+    FRAMES_PER_SECOND = 60.0
+    SUBDATASET_PATTERN = re.compile('[0-9]{2}_[0-9]{2}_[0-9]{2}')
 
+    class Stage(enum.Enum):
+        TREETOP_LODGE = 1
+        FIRE_CAPITOL = 2
+        AIR_ARMADA = 3
+        ROCK_WALL = 4
+        MERCHANT_PORT = 5
+        BLAZING_HIDEOUT = 7
+        TOWER_OF_HEAVEN = 8
 
-class Stage(enum.Enum):
-    TREETOP_LODGE = 1
-    FIRE_CAPITOL = 2
-    AIR_ARMADA = 3
-    ROCK_WALL = 4
-    MERCHANT_PORT = 5
-    BLAZING_HIDEOUT = 7
-    TOWER_OF_HEAVEN = 8
+    class StageMode(enum.Enum):
+        BASIC = 0
+        AETHER = 1
 
+    class Character(enum.Enum):
+        ZETTERBURN = 2
+        ORCANE = 3
+        WRASTOR = 4
+        KRAGG = 5
+        FORSBURN = 6
+        MAYPUL = 7
+        ABSA = 8
+        ETALUS = 9
+        ORI = 10
+        RANNO = 11
+        CLAIREN = 12
 
-class StageMode(enum.Enum):
-    BASIC = 0
-    AETHER = 1
-
-
-class Character(enum.Enum):
-    ZETTERBURN = 2
-    ORCANE = 3
-    WRASTOR = 4
-    KRAGG = 5
-    FORSBURN = 6
-    MAYPUL = 7
-    ABSA = 8
-    ETALUS = 9
-    ORI = 10
-    RANNO = 11
-    CLAIREN = 12
-
-
-class InputSequences:
-    splash_to_main = [1.5, 'Z', 'X', 'Z', 'Z', 'Z', 'Z']
-    main_to_replay = [0.5, 'DOWN', 'DOWN', 'DOWN', 'Z', 1, 'Z']
-    start_replay_1 = [1, 'Z', 'Z']
-    back_and_forth = [1, 'X', 'Z']
+    class InputSequences:
+        splash_to_main = [1.5, 'Z', 'X', 'Z', 'Z', 'Z', 'Z']
+        main_to_replay = [0.5, 'DOWN', 'DOWN', 'DOWN', 'Z', 1, 'Z']
+        start_replay_1 = [1, 'Z', 'Z']
+        back_and_forth = [1, 'X', 'Z']
 
 
 class ReplayManager:
