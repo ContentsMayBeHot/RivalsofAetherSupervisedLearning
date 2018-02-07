@@ -65,6 +65,25 @@ class ReplayManager:
         # Initialize subdataset values to 'None'
         self.__flush_subdataset()
 
+    def establish_subdatasets():
+        for dirent in os.listdir(self.replays_abspath):
+            if not dirent.endswith('.roa'):
+                continue
+            dirent_abspath = os.path.join(self.replays_abspath, dirent)
+            with open(dirent_abspath) as roa_fin:
+                # Get the version string
+                ln = roa_fin.readline()
+                version = '{}_{}_{}'.format(str(ln[1:3]),
+                                            str(ln[3:5]),
+                                            str(ln[5:7]))
+                # Make a directory with the version string as its name
+                subdataset_abspath = os.path.join(self.replays_abspath, version)
+                if not os.path.exists(subdataset_abspath):
+                    os.mkdir(subdataset_abspath)
+                # Move the replay to the new directory
+                os.rename(dirent_abspath,
+                          os.path.join(subdataset_abspath, dirent))
+
     def load_subdataset(self, subdataset_dname=None):
         '''Load the subdataset for a particular game version.'''
         # If no folder provided, choose the one for version specified in config
