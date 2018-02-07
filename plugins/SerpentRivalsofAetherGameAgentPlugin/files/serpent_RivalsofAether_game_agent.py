@@ -5,6 +5,7 @@ from serpent.frame_grabber import FrameGrabber
 from serpent.input_controller import KeyboardKey
 
 from .helpers.replay_management import ReplayManager
+from .helpers.replay_management import Game
 
 import datetime
 import time
@@ -50,22 +51,30 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
 
         self.replay_manager = ReplayManager()
         self.replay_manager.load_subdataset()
-        self.game_state = 0
+
+        self.game_state = Game.State.SPLASH_SCREEN
 
     def handle_play(self, game_frame):
         print('Hellow')
 
     def handle_collect(self, game_frame):
-        if self.game_state is 0:
-            self.tap_sequence(InputSequence.splash_to_main)
-            self.tap_sequence(InputSequence.main_to_replay)
-            self.game_state = 1
-        elif self.game_state is 1:
-            self.replay_manager.get_next_replay(replay_name)
-            self.tap_sequence(InputSequence.start_replay_1)
-            self.game_state = 2
-        elif self.game_state is 2:
-            self.game_state = 1
+        # Go from splash screen to replay menu
+        if self.game_state is Game.State.SPLASH_SCREEN:
+            self.tap_sequence(Game.Sequence.splash_to_main)
+            self.tap_sequence(Game.Sequence.main_to_replay)
+            self.game_state = Game.State.REPLAY_MENU
+
+        # Go from replay menu to playback
+        elif self.game_state is Game.State.REPLAY_MENU:
+            roa_fname = self.replay_manager.next_roa()
+            # TODO: Parse the replay file
+            # roa = ?
+            self.tap_sequence(Game.Sequence.start_replay_1)
+            self.game_state = Game.State.REPLAY_PLAYBACK
+
+        # Collect frames during playback
+        elif self.game_state is Game.State.REPLAY_PLAYBACK:
+            pass
 
     def tap_sequence(self, sequence, delay_override=None):
         # Must contain delay value and one input/wait token

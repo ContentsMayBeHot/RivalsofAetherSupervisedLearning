@@ -6,9 +6,18 @@ import re
 import shutil
 
 
-class GameHelper:
+class Game:
     FRAMES_PER_SECOND = 60.0
     SUBDATASET_PATTERN = re.compile('[0-9]{2}_[0-9]{2}_[0-9]{2}')
+
+    class State(enum.Enum):
+        SPLASH_SCREEN = enum.auto()
+        MAIN_MENU = enum.auto()
+        REPLAY_MENU = enum.auto()
+        REPLAY_PLAYBACK = enum.auto()
+        CHARACTER_SELECTION = enum.auto()
+        STAGE_SELECTION = enum.auto()
+        GAMEPLAY = enum.auto()
 
     class Stage(enum.Enum):
         TREETOP_LODGE = 1
@@ -36,7 +45,7 @@ class GameHelper:
         RANNO = 11
         CLAIREN = 12
 
-    class InputSequences:
+    class Sequence:
         splash_to_main = [1.5, 'Z', 'X', 'Z', 'Z', 'Z', 'Z']
         main_to_replay = [0.5, 'DOWN', 'DOWN', 'DOWN', 'Z', 1, 'Z']
         start_replay_1 = [1, 'Z', 'Z']
@@ -116,7 +125,7 @@ class ReplayManager:
         p = SUBDATASET_PATTERN
         return [ x for x in os.listdir(self.replays_apath) if p.match(x) ]
 
-    def next_roa(self):
+    def next_roa(self, as_):
         '''Get a new .roa file.'''
         # Get the next .roa from the unvisited list
         if not self.dataset_unvisited:
