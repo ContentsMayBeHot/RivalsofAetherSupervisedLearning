@@ -6,8 +6,8 @@ Please observe the following postfix notation:
 
 - File names: "_fname"
 - Directory names: "_dname"
-- Absolute paths: "_abspath"
-- Relative paths: "_relpath"
+- Absolute paths: "_apath"
+- Relative paths: "_rpath"
 
 When referring to replay files in code, say "roa" rather than "replay". This helps avoid confusion between the replays folder and an individual replay file. For example, "roa_abspath" and "replays_abspath" are much more easily distinguishable than "replay_abspath" and "replays_abspath".
 
