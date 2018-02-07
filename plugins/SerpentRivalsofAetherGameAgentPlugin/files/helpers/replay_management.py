@@ -7,6 +7,7 @@ import shutil
 
 
 FRAMES_PER_SECOND = 60.0
+SUBDATASET_PATTERN = re.compile('[0-9]{2}_[0-9]{2}_[0-9]{2}')
 
 
 class Stage(enum.Enum):
@@ -65,24 +66,26 @@ class ReplayManager:
         # Initialize subdataset values to 'None'
         self.__flush_subdataset()
 
-    def establish_subdatasets():
+    def establish_subdatasets(self):
+        '''Sort .roa files by version into subdatasets'''
         for dirent in os.listdir(self.replays_abspath):
             if not dirent.endswith('.roa'):
                 continue
-            dirent_abspath = os.path.join(self.replays_abspath, dirent)
-            with open(dirent_abspath) as roa_fin:
+            dirent_abspath = os.path.join(self.replays_abspath, roa_fname)
+            # Open the .roa file
+            with open(dirent_abspath) as fin:
                 # Get the version string
-                ln = roa_fin.readline()
+                ln = fin.readline()
                 version = '{}_{}_{}'.format(str(ln[1:3]),
                                             str(ln[3:5]),
                                             str(ln[5:7]))
-                # Make a directory with the version string as its name
+                # Ensure subdataset folder exists
                 subdataset_abspath = os.path.join(self.replays_abspath, version)
                 if not os.path.exists(subdataset_abspath):
                     os.mkdir(subdataset_abspath)
                 # Move the replay to the new directory
-                os.rename(dirent_abspath,
-                          os.path.join(subdataset_abspath, dirent))
+                new_dirent_abspath = os.path.join(subdataset_abspath, dirent)
+                os.rename(dirent_abspath, new_dirent_abspath)
 
     def load_subdataset(self, subdataset_dname=None):
         '''Load the subdataset for a particular game version.'''
@@ -113,7 +116,7 @@ class ReplayManager:
 
     def get_existing_subdatasets(self):
         '''Get a list of subdatasets, where each represents a game version.'''
-        p = re.compile('[0-9]{2}_[0-9]{2}_[0-9]{2}')
+        p = SUBDATASET_PATTERN
         return [ x for x in os.listdir(self.replays_abspath) if p.match(x) ]
 
     def next_roa(self):
