@@ -65,10 +65,14 @@ class ReplayManager:
         # Initialize subdataset values to 'None'
         self.__flush_subdataset()
 
-    def load_subdataset(self, subdataset_dname):
+    def load_subdataset(self, subdataset_dname=None):
         '''Load the subdataset for a particular game version.'''
+        # If no folder provided, choose the one for version specified in config
+        if not subdataset_dname:
+            subdataset_dname = self.get_current_version(as_dname=True)
         self.subdataset_abspath = os.path.join(self.replays_abspath,
                                                subdataset_dname)
+        # Load subdataset from folder
         self.subdataset = [
             dirent for dirent in os.listdir(self.subdataset_abspath)
             if dirent.endswith('.roa')
@@ -76,29 +80,42 @@ class ReplayManager:
         self.subdataset_unvisited = list(self.subdataset) # Ensure it's a copy
         self.subdataset_visited = []
 
-    def __flush_subdataset(self):
-        '''Reset subdataset to starting values.'''
-        self.subdataset_abspath = None
-        self.subdataset = None
-        self.subdataset_unvisited = None
-        self.subdataset_visited = None
+    def get_current_version(self, as_dname=False):
+        '''Get the current game version as specified in the config file.'''
+        # Get in this format: x.y.z
+        version self.config['RivalsofAether']['GameVersion']
+        if as_dname:
+            # Convert to the following format: xx_yy_zz (with leading 0s)
+            version = '_'.join([
+                x if len(x) > 1 else '0' + x
+                for x in version.split('.') if x.isdigit()
+                ])
+        return version
 
-    def get_available_subdatasets(self):
+    def get_existing_subdatasets(self):
         '''Get a list of subdatasets, where each represents a game version.'''
         p = re.compile('[0-9]{2}_[0-9]{2}_[0-9]{2}')
         return [ x for x in os.listdir(self.replays_abspath) if p.match(x) ]
 
     def next_roa(self):
         '''Get a new .roa file.'''
+        # Get the next .roa from the unvisited list
         if not self.dataset_unvisited:
             return None
         roa_fname = self.subdataset_unvisited[0]
 
+        # Replace current .roas with the next .roa and mark latter as visited
         self.__flush_replays()
         self.__transfer_roa(roa_fname)
         self.__visit(roa_fname)
-
         return roa_fname
+
+    def __flush_subdataset(self):
+        '''Reset subdataset to starting values.'''
+        self.subdataset_abspath = None
+        self.subdataset = None
+        self.subdataset_unvisited = None
+        self.subdataset_visited = None
 
     def __flush_replays(self):
         ''' Remove all .roa files from the replays folder.'''

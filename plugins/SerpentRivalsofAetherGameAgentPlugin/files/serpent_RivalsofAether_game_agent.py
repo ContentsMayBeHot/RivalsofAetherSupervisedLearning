@@ -48,8 +48,8 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
     def setup_collect(self):
         self.setup_common()
 
-        version_name = ReplayManager.read_replay_version()
-        self.replay_manager = ReplayManager(version_name)
+        self.replay_manager = ReplayManager()
+        self.replay_manager.load_subdataset()
         self.game_state = 0
 
     def handle_play(self, game_frame):
