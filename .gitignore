@@ -125,3 +125,7 @@ ENV/
 *.mtc1
 *.out
 *.synctex.gz
+
+# Other Files
+
+.DS_Store
