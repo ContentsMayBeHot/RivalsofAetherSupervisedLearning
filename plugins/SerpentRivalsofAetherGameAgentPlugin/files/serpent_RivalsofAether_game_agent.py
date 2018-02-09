@@ -9,6 +9,7 @@ from .helpers.replay_management import Game
 
 import datetime
 import time
+import sys
 
 class SerpentRivalsofAetherGameAgent(GameAgent):
     def __init__(self, **kwargs):
@@ -63,17 +64,15 @@ class SerpentRivalsofAetherGameAgent(GameAgent):
             self.tap_sequence(Game.Sequence.splash_to_main)
             self.tap_sequence(Game.Sequence.main_to_replay)
             self.game_state = Game.State.REPLAY_MENU
-
         # Go from replay menu to playback
         elif self.game_state is Game.State.REPLAY_MENU:
-            roa_fname = self.replay_manager.next_roa()
-            # TODO: Parse the replay file
-            # roa = ?
+            roa_apath = self.replay_manager.next_roa(apath=True)
+            self.roa = parse_wrapper(roa_fname)
             self.tap_sequence(Game.Sequence.start_replay_1)
             self.game_state = Game.State.REPLAY_PLAYBACK
-
         # Collect frames during playback
         elif self.game_state is Game.State.REPLAY_PLAYBACK:
+            # TODO: Write this
             pass
 
     def tap_sequence(self, sequence, delay_override=None):

@@ -5,7 +5,6 @@ import random
 import re
 import shutil
 
-
 class Game:
     FRAMES_PER_SECOND = 60.0
     SUBDATASET_PATTERN = re.compile('[0-9]{2}_[0-9]{2}_[0-9]{2}')
@@ -111,7 +110,7 @@ class ReplayManager:
     def get_current_version(self, as_dname=False):
         '''Get the current game version as specified in the config file.'''
         # Get in this format: x.y.z
-        version self.config['RivalsofAether']['GameVersion']
+        version = self.config['RivalsofAether']['GameVersion']
         if as_dname:
             # Convert to the following format: xx_yy_zz (with leading 0s)
             version = '_'.join([
@@ -125,7 +124,7 @@ class ReplayManager:
         p = SUBDATASET_PATTERN
         return [ x for x in os.listdir(self.replays_apath) if p.match(x) ]
 
-    def next_roa(self, as_):
+    def next_roa(self, apath=False):
         '''Get a new .roa file.'''
         # Get the next .roa from the unvisited list
         if not self.dataset_unvisited:
@@ -136,6 +135,9 @@ class ReplayManager:
         self.__flush_replays()
         self.__transfer_roa(roa_fname)
         self.__visit(roa_fname)
+
+        if apath:
+            return os.path.join(self.subdataset_apath, roa_fname)
         return roa_fname
 
     def __flush_subdataset(self):
