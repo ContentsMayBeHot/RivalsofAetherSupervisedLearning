@@ -29,7 +29,7 @@ Install all dependencies listed above. Please refer to their respective installa
 
 Please note that you must use Pip to install SerpentAI. For all other Python packages we recommend using Conda. Also, some of the guides linked above will ask you to create a conda environment; be sure to create only **one** environment for all of this project's dependencies.
 
-After setting up SerpentAI, clone the [game plugin](https://github.com/ContentsMayBeHot/SerpentRivalsofAetherGamePlugin) and [game agent plugin](https://github.com/ContentsMayBeHot/SerpentRivalsofAetherGameAgentPlugin) to _{path to SerpentAI folder}/plugins_. This should result in the following file tree:
+After setting up SerpentAI, clone the [game plugin](https://github.com/ContentsMayBeHot/SerpentRivalsofAetherGamePlugin) and [game agent plugin](https://github.com/ContentsMayBeHot/SerpentRivalsofAetherGameAgentPlugin) to _{path to SerpentAI folder}/plugins_. This should result in the following directory tree:
 ```
 ├── SerpentAI
 │   ├── config
