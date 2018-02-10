@@ -39,6 +39,8 @@ After setting up SerpentAI, clone the [game plugin](https://github.com/ContentsM
 │       └── SerpentRivalsofAetherGamePlugin
 ```
 
+_SerpentRivalsofAetherGameAgentPlugin_ contains a submodule, so be sure to open it in Git Bash (or your preferred equivalent) and run _git submodule update --init --recursive_.
+
 Also, you will need to add the following to _{path to SerpentAI}\plugins\SerpentRivalsofAetherGameAgentPlugin\files\helpers\roa.ini_:
 
 ```
