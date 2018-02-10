@@ -27,23 +27,29 @@ The project is currently only supported on Windows 10; this may change if the ga
 
 Install all dependencies listed above. Please refer to their respective installation guides for your platform.
 
-Please note that you must use Pip to install SerpentAI. For all other Python packages we recommend using Conda. Also, some of the above guides will ask you to create a conda environment; be sure to create only **one** environment for this project.
+Please note that you must use Pip to install SerpentAI. For all other Python packages we recommend using Conda. Also, some of the guides linked above will ask you to create a conda environment; be sure to create only **one** environment for all of this project's dependencies.
 
-After setting up SerpentAI, it is recommended that you use the mklink command create a symbolic link from {path to SerpentAI}\plugins to {path to repository}\plugins; this will allow you to keep the plugins up to date without having to manually copy any files.
+After setting up SerpentAI, clone the [game plugin](https://github.com/ContentsMayBeHot/SerpentRivalsofAetherGamePlugin) and [game agent plugin](https://github.com/ContentsMayBeHot/SerpentRivalsofAetherGameAgentPlugin) to _{path to SerpentAI folder}/plugins_. This should result in the following file tree:
+```
+├── SerpentAI
+│   ├── config
+│   ├── datasets
+│   └── plugins
+│       ├── SerpentRivalsofAetherGameAgentPlugin
+│       └── SerpentRivalsofAetherGamePlugin
+```
 
-Also, you will need to add the following to {path to repository}\scripts\roa.ini:
+Also, you will need to add the following to _{path to SerpentAI}\plugins\SerpentRivalsofAetherGameAgentPlugin\files\helpers\roa.ini_:
 
 ```
 [RivalsofAether]
 PathToReplays = {path to your replays folder}
 ```
 
-You should be able to find your replays folder at the following location: C:\Users\{your user name}\AppData\Local\RivalsofAether\replays
+You should be able to find your replays folder at the following location: _{path to your user folder}\AppData\Local\RivalsofAether\replays_
 
 <h2>Usage</h2>
 
 <h3>Preparing your dataset</h3>
 
 Place all of your replay files inside of your replays folder; this is the the same folder that the game uses and that you provided a path to in the roa.ini file.
-
-Next, run the version sorter program in the scripts folder of the repository. This will result in all of your replays being moved to subdirectories named after game versions.
