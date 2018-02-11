@@ -39,19 +39,62 @@ After setting up SerpentAI, clone the [game plugin](https://github.com/ContentsM
 │       └── SerpentRivalsofAetherGamePlugin
 ```
 
-_SerpentRivalsofAetherGameAgentPlugin_ contains a submodule, so be sure to open it in Git Bash (or your preferred equivalent) and run _git submodule update --init --recursive_.
+_SerpentRivalsofAetherGameAgentPlugin_ contains a submodule, so be sure to open it in Git Bash (or your preferred equivalent) and run **git submodule update --init --recursive**. In the future, you can update the submodule to the latest commit by entering it in Git Bash and running **git pull remote master**.
 
-Also, you will need to add the following to _{path to SerpentAI}\plugins\SerpentRivalsofAetherGameAgentPlugin\files\helpers\roa.ini_:
+Next, you will need to add the following to _{path to SerpentAI}\plugins\SerpentRivalsofAetherGameAgentPlugin\files\helpers\roa.ini_:
 
 ```
 [RivalsofAether]
 PathToReplays = {path to your replays folder}
+Version = {game version you want to use, e.g. 1.2.2}
 ```
 
-You should be able to find your replays folder at the following location: _{path to your user folder}\AppData\Local\RivalsofAether\replays_
+You should be able to find the game's replays folder at _{path to your user folder}\AppData\Local\RivalsofAether\replays_
 
 <h2>Usage</h2>
 
-<h3>Preparing your dataset</h3>
+<h3>Preparing your replay files</h3>
 
-Place all of your replay files inside of your replays folder; this is the the same folder that the game uses and that you provided a path to in the roa.ini file.
+Place all of your replay files inside of the game's folder. Next, run **python {path to SerpentAI}\plugins\SerpentRivalsofAetherGameAgentPlugin\files\helpers\replaymanager.py** to automatically move your replay files into folders corresponding with their respective game versions. This will result in a directory tree that looks something like this:
+
+```
+├── replays
+│   ├── 00_15_07
+│   ├── 00_15_08
+│   ├── 00_15_09
+│   ├── 00_15_10
+│   ├── 00_15_11
+│   ├── 01_00_02
+│   ├── 01_00_03
+│   ├── 01_00_05
+│   ├── 01_01_02
+│   ├── 01_02_01
+│   └── 01_02_02
+```
+
+"00_15_07" refers to game version 0.15.7, "01_02_01" to 1.2.1, and so on.
+
+<h3>Collecting frames</h3>
+
+Make sure Steam is running and _Rivals of Aether_ is installed. Then, launch Anaconda Prompt, activate the project environment, change to the SerpentAI setup folder, and, finally, run **serpent launch RivalsofAether**. Once this command is finished processing, run **serpent play RivalsofAether SerpentRivalsofAetherGameAgent COLLECT**.
+
+The game agent will begin collecting game frames and dumping them into binary files located in replays\frames. A directory structure like this will develop:
+
+```
+├── replays
+│   ├── 00_15_07
+│   ├── 00_15_08
+│   ├── 00_15_09
+│   ├── 00_15_10
+│   ├── 00_15_11
+│   ├── 01_00_02
+│   ├── 01_00_03
+│   ├── 01_00_05
+│   ├── 01_01_02
+│   ├── 01_02_01
+│   ├── 01_02_02
+│   └── frames
+│       └── 2017-11-07-234241093349
+```
+
+The new folders appearing under _replays\frames_ are each associated with a different replay file. The folder shown above _2017-11-07-234241093349_, is associated with a replay file called _2017-11-07-234241093349.roa_.
