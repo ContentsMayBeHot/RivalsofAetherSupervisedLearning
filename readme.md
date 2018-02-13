@@ -76,22 +76,16 @@ Place all of your replay files inside of the game's folder. Next, run **python {
 
 <h3>Collecting frames</h3>
 
-Make sure Steam is running and _Rivals of Aether_ is installed. Then, launch Anaconda Prompt, activate the project environment, change to the SerpentAI setup folder, and, finally, run **serpent launch RivalsofAether**. Once this command is finished processing, run **serpent play RivalsofAether SerpentRivalsofAetherGameAgent COLLECT**.
+Launch Anaconda Prompt, activate the project environment, change to the SerpentAI setup folder, and run the following commands: 1) **serpent activate SerpentRivalsofAetherGamePlugin**, and 2) **serpent activate SerpentRivalsofAetherGameAgentPlugin**. You can also run **serpent plugins** to check available and activated plugins.
 
-The game agent will begin collecting game frames and dumping them into binary files located in replays\frames. A directory structure like this will develop:
+To collect frames effectively we will need to override the game frame limiter setting for our game agent. Open {path to SerpentAI setup folder}/config/config.plugins.yml and update the FPS value for SerpentRivalsofAetherGameAgentPlugin.
+
+Make sure Steam is running and _Rivals of Aether_ is installed. Finally, run **serpent launch RivalsofAether** and then run **serpent play RivalsofAether SerpentRivalsofAetherGameAgent COLLECT**. The game agent will begin collecting game frames and dumping them into binary files located in replays\frames. A directory structure like this will develop:
 
 ```
 ├── replays
 │   ├── 00_15_07
-│   ├── 00_15_08
-│   ├── 00_15_09
-│   ├── 00_15_10
-│   ├── 00_15_11
-│   ├── 01_00_02
-│   ├── 01_00_03
-│   ├── 01_00_05
-│   ├── 01_01_02
-│   ├── 01_02_01
+│   ...
 │   ├── 01_02_02
 │   └── frames
 │       └── 2017-11-07-234241093349
