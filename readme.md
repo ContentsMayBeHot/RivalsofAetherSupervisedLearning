@@ -78,7 +78,7 @@ Move all of your _roa_ files to the game's replays folder. Next, run **python /p
 
 Launch Anaconda Prompt, activate the project environment, navigate to _/.../SerpentAI/_, and run the following commands: 1) **serpent activate SerpentRivalsofAetherGamePlugin**, and 2) **serpent activate SerpentRivalsofAetherGameAgentPlugin**. You can also run **serpent plugins** to check available and activated plugins.
 
-To collect frames effectively, we will need to override the game frame limiter setting for our game agent. Open _/.../SerpentAI/config/config.plugins.yml_ in a text editor and update the FPS value for SerpentRivalsofAetherGameAgentPlugin.
+To collect frames effectively, we will need to override the game frame limiter setting for our game agent. Open _/.../SerpentAI/config/config.plugins.yml_ in a text editor and update the FPS value for _SerpentRivalsofAetherGameAgentPlugin_. We found that 10 FPS offers a decent balance.
 
 Make sure Steam is running and _Rivals of Aether_ is installed. We recommend that you also turn off the Steam overlay so that inventory and friend notifications don't appear on the screen. Next, run **serpent launch RivalsofAether**. Once the game has finished loading the main menu, go to the replays menu by going to extras -> replays. Finally, run **serpent play RivalsofAether SerpentRivalsofAetherGameAgent COLLECT** in Anaconda Prompt. The game agent will begin collecting game frames and parsed player input data and dumping them as binary files located in _/.../replays/frames_ and _/.../replays/labels_, respectively. A directory structure similar to this will develop:
 
@@ -103,3 +103,5 @@ Make sure Steam is running and _Rivals of Aether_ is installed. We recommend tha
 ```
 
 Avoid taking focus away from the game's window while the frame collector agent is running. If you need to stop the agent, bring Anaconda Prompt into focus. Doing so will automatically pause the agent. Next, press CTRL+C to terminate the agent. If a replay was in progress, then be sure to delete the corresponding frames and labels folders.
+
+Please be aware that the collector agent dumps about 1 GB of frame buffer data for every 4 minutes of playback. During our  initial experiments we processed just over 330 replay files, which resulted in more 40 GB of frame buffer data. If you are concerned about space requirements, you can set up a symbolic link from _/.../replays/frames_ to a different storage device with a higher capacity.
