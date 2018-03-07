@@ -98,9 +98,8 @@ Make sure Steam is running and _Rivals of Aether_ is installed. We recommend tha
 │       ├── 2017-11-07-234316128959
 │       ├── ...
 │       └── 2017-11-07-234241093349
-│           ├── 0.npy
-│           ├── ...
-│           └── 4475.npy
+│           ├── roa_1.npy
+│           └── roa_2.npy
 ```
 
 Avoid taking focus away from the game's window while the frame collector agent is running. If you need to stop the agent, bring Anaconda Prompt into focus. Doing so will automatically pause the agent. Next, press CTRL+C to terminate the agent. If a replay was in progress, then be sure to delete the corresponding frames and labels folders.
