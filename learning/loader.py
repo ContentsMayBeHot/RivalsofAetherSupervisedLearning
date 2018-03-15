@@ -18,7 +18,6 @@ class ReplayLoader:
 
     def load(self, set_apath):
         '''Load paths to all frame and label data for a given set'''
-        print('Loading from', set_apath)
         xset = []
         xset_apath = os.path.join(set_apath, 'frames')
         xset = [
@@ -35,11 +34,13 @@ class ReplayLoader:
 
     def load_training(self):
         '''Load paths to all frame and label data for the training set'''
+        print('Loading training set')
         set_apath = self.config['SETS']['PathToTraining']
         (self.x_train, self.y_train) = self.load(set_apath)
 
     def load_testing(self):
         '''Load paths to all frame and label data for the testing set'''
+        print('Loading testing set')
         set_apath = self.config['SETS']['PathToTesting']
         (self.x_test, self.y_test) = self.load(set_apath)
 
@@ -63,9 +64,9 @@ class ReplayLoader:
         batch_x = []
         batch_y = []
         for i in range(n):
+            print('Fetching training batch [{}/{}]'.format(i+1, n))
             xdir_apath = self.x_train.pop()
             ydir_apath = self.y_train.pop()
-            print('[{}/{}]: {}\t{}'.format(i, n, xdir_apath, ydir_apath))
             (x, y) = self.get_sync(xdir_apath, ydir_apath)
             batch_x.append(x)
             batch_y.append(y)
@@ -77,6 +78,7 @@ class ReplayLoader:
         batch_x = []
         batch_y = []
         for i in range(n):
+            print('Fetching testing batch [{}/{}]'.format(i+1, n))
             xdir_apath = self.x_test.pop()
             ydir_apath = self.y_test.pop()
             (x, y) = self.get_sync(xdir_apath, ydir_apath)
