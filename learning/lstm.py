@@ -22,7 +22,7 @@ def main():
     # Load data
     roa = loader.ReplayLoader()
     roa.load_training()
-    (data,labels) = roa.next_training(n=batch_size)
+    (data,labels) = roa.next_training_batch(n=batch_size)
 
     model.fit(data, labels)
 
