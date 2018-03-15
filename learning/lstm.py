@@ -7,11 +7,8 @@ import loader
 
 def main():
     roa = loader.ReplayLoader()
-    (x_train,y_train) = roa.load_training()
-    (x_test,y_test) = roa.load_testing()
-
-    print('xtrain:', len(x_train), '\tytrain:', len(y_train))
-    print('xtest:', len(x_test), '\tytest:', len(y_test))
+    roa.load_training()
+    roa.load_testing()
 
     (batch_x,batch_y) = roa.next_testing()
     print('Loaded first batch. Batch size:', len(batch_x))
