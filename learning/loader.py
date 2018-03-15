@@ -45,8 +45,11 @@ class ReplayLoader:
 
     def get_sync(self, xdir_apath, ydir_apath):
         '''Get the synced x and y data for a collection of frames and labels'''
+        ydir = self.__listdir_np_only__(ydir_apath)
+        y_fname = ydir[0]
+        y_apath = os.path.join(ydir_apath, y_fname)
         synced = roasync.SyncedReplay()
-        synced.create_sync_from_npys(xdir_apath, ydir_apath)
+        synced.create_sync_from_npys(xdir_apath, y_apath)
         x = []
         y = []
         for pair in synced.synced_frames:
@@ -54,25 +57,26 @@ class ReplayLoader:
             y.append(pair.actions)
         return (x, y)
 
-    def next_training(self, size=100):
+    def next_training(self, n=100):
         '''Load a batch of synced x and y data from the training set'''
-        size = min(size, len(self.y_train))
+        size = min(n, len(self.y_train))
         batch_x = []
         batch_y = []
-        for i in range(size):
+        for i in range(n):
             xdir_apath = self.x_train.pop()
             ydir_apath = self.y_train.pop()
+            print('[{}/{}]: {}\t{}'.format(i, n, xdir_apath, ydir_apath))
             (x, y) = self.get_sync(xdir_apath, ydir_apath)
             batch_x.append(x)
             batch_y.append(y)
         return (batch_x, batch_y)
 
-    def next_testing(self, size=100):
+    def next_testing(self, n=100):
         '''Load a batch of synced x and y data from the testing set'''
-        size = min(size, len(self.y_test))
+        size = min(n, len(self.y_test))
         batch_x = []
         batch_y = []
-        for i in range(size):
+        for i in range(n):
             xdir_apath = self.x_test.pop()
             ydir_apath = self.y_test.pop()
             (x, y) = self.get_sync(xdir_apath, ydir_apath)

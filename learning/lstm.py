@@ -8,9 +8,8 @@ import loader
 def main():
     roa = loader.ReplayLoader()
     roa.load_training()
-    roa.load_testing()
 
-    (batch_x,batch_y) = roa.next_testing()
+    (batch_x,batch_y) = roa.next_training()
     print('Loaded first batch. Batch size:', len(batch_x))
 
     #model = Sequential()
