@@ -46,7 +46,7 @@ class ReplayLoader:
         (self.x_test, self.y_test) = self.__load__(set_apath)
         print('Finished loading testing set. Size is', len(self.x_test))
 
-    def __get_sync__(self, xdir_apath, ydir_apath):
+    def __unpack_sample__(self, xdir_apath, ydir_apath):
         '''Get the synced x and y data for a collection of frames and labels'''
         ydir = self.__listdir_np_only__(ydir_apath)
         y_fname = ydir[0]
@@ -55,38 +55,31 @@ class ReplayLoader:
         synced.create_sync_from_npys(xdir_apath, y_apath)
         x = []
         y = []
+        # For each synced frame in the replay
         for pair in synced.synced_frames:
             frame = pair.frame
             label = pair.actions
             if label is None:
-                label = np.zeros(26)
+                label = list(np.zeros(26))
             else:
-                label = np.array(label)
+                label = list(label)
             x.append(frame) # shape: (135, 240, 3)
             y.append(label) # shape: (26,)
-        x = np.array(x)
-        y = np.array(y)
         return (x, y)
 
-    def __next_batch__(self, x_set, y_set, n=100):
-        size = min(n, len(self.y_train))
-        batch_x = []
-        batch_y = []
-        for i in range(n):
-            xdir_apath = x_set.pop()
-            ydir_apath = y_set.pop()
-            (x,y) = self.__get_sync__(xdir_apath, ydir_apath)
-            batch_x.append(x)
-            batch_y.append(y)
-        return (batch_x,batch_y)
+    def __next_sample__(self, x_set, y_set):
+        xdir_apath = x_set.pop()
+        ydir_apath = y_set.pop()
+        (x,y) = self.__unpack_sample__(xdir_apath, ydir_apath)
+        return (x,y)
 
-    def next_training_batch(self, n=100):
+    def next_training_sample(self):
         '''Load a batch of synced x and y data from the training set'''
-        return self.__next_batch__(self.x_train, self.y_train, n=n)
+        return self.__next_sample__(self.x_train, self.y_train)
 
-    def next_testing_batch(self, n=100):
+    def next_testing_sample(self):
         '''Load a batch of synced x and y data from the testing set'''
-        return self.__next_batch__(self.x_test, self.y_test, n=n)
+        return self.__next_sample__(self.x_test, self.y_test)
 
     def __listdir_subdir_only(self, apath):
         '''listdir filtered to only get folders'''

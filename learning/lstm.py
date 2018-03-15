@@ -1,20 +1,21 @@
 import numpy as np
 import keras
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
-from keras.layers import Embedding
-from keras.layers import LSTM
+from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, Flatten
 
 import loader
 
 def main():
-    batch_size = 5
-    input_shape = (batch_size, 135, 240, 3)
+    batch_size = 1
+    input_shape = (135, 240, 3)
     num_classes = 26
 
     # Compile model
     model = Sequential()
-    model.add(Dense(32, input_shape=input_shape))
+    model.add(Dense(units=32, input_shape=input_shape))
+    model.add(Dense(units=10))
+    model.add(Flatten())
+    model.add(Dense(units=26))
     model.compile(optimizer='rmsprop',
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
@@ -22,9 +23,13 @@ def main():
     # Load data
     roa = loader.ReplayLoader()
     roa.load_training()
-    (data,labels) = roa.next_training_batch(n=batch_size)
+    (x,y) = roa.next_training_sample()
 
-    model.fit(data, labels)
+    x_train = np.array(x)
+    y_train = np.array(y)
+    print(x_train.shape)
+
+    model.fit(x_train, y_train)
 
 if __name__ == '__main__':
     main()
