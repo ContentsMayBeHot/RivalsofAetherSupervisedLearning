@@ -37,12 +37,14 @@ class ReplayLoader:
         print('Loading training set')
         set_apath = self.config['SETS']['PathToTraining']
         (self.x_train, self.y_train) = self.load(set_apath)
+        print('Finished loading training set. Size is', len(self.x_train))
 
     def load_testing(self):
         '''Load paths to all frame and label data for the testing set'''
         print('Loading testing set')
         set_apath = self.config['SETS']['PathToTesting']
         (self.x_test, self.y_test) = self.load(set_apath)
+        print('Finished loading testing set. Size is', len(self.x_test))
 
     def get_sync(self, xdir_apath, ydir_apath):
         '''Get the synced x and y data for a collection of frames and labels'''
@@ -54,8 +56,16 @@ class ReplayLoader:
         x = []
         y = []
         for pair in synced.synced_frames:
-            x.append(pair.frame)
-            y.append(pair.actions)
+            frame = pair.frame
+            label = pair.actions
+            if label is None:
+                label = np.zeros(26)
+            else:
+                label = np.array(label)
+            x.append(frame) # shape: (135, 240, 3)
+            y.append(label) # shape: (26,)
+        x = np.array(x)
+        y = np.array(y)
         return (x, y)
 
     def next_training(self, n=100):

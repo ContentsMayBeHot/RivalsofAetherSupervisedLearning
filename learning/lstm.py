@@ -1,22 +1,30 @@
-#from keras.models import Sequential
-#from keras.layers import Dense, Dropout
-#from keras.layers import Embedding
-#from keras.layers import LSTM
+import numpy as np
+import keras
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Activation
+from keras.layers import Embedding
+from keras.layers import LSTM
 
 import loader
 
 def main():
+    batch_size = 5
+    input_shape = (batch_size, 135, 240, 3)
+    num_classes = 26
+
+    # Compile model
+    model = Sequential()
+    model.add(Dense(32, input_shape=input_shape))
+    model.compile(optimizer='rmsprop',
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+
+    # Load data
     roa = loader.ReplayLoader()
     roa.load_training()
+    (data,labels) = roa.next_training(n=batch_size)
 
-    (batch_x,batch_y) = roa.next_training()
-    print('Loaded first batch. Batch size:', len(batch_x))
-
-    #model = Sequential()
-    #model.add(LSTM(128))
-    #model.add(Dropout(0.5))
-    #model.add(Dense(1, activation='sigmoid'))
-    # Reference: https://keras.io/getting-started/sequential-model-guide/
+    model.fit(data, labels)
 
 if __name__ == '__main__':
     main()
