@@ -73,11 +73,11 @@ class ReplayLoader:
         (x,y) = self.__unpack_sample__(xdir_apath, ydir_apath)
         return (x,y)
 
-    def next_training_sample(self):
+    def next_training_sample(self, n=1):
         '''Load a batch of synced x and y data from the training set'''
         return self.__next_sample__(self.x_train, self.y_train)
 
-    def next_testing_sample(self):
+    def next_testing_sample(self, n=1):
         '''Load a batch of synced x and y data from the testing set'''
         return self.__next_sample__(self.x_test, self.y_test)
 

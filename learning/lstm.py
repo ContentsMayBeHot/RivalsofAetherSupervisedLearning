@@ -15,7 +15,7 @@ def main():
     model.add(Dense(units=32, input_shape=input_shape))
     model.add(Dense(units=10))
     model.add(Flatten())
-    model.add(Dense(units=26))
+    model.add(Dense(units=num_classes))
     model.compile(optimizer='rmsprop',
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
@@ -23,12 +23,18 @@ def main():
     # Load data
     roa = loader.ReplayLoader()
     roa.load_training()
-    (x,y) = roa.next_training_sample()
+    x_train = []
+    y_train = []
+    n = 10
+    for i in range(n):
+        print('Fetching sample [{}/{}]'.format(i+1, n))
+        (x,y) = roa.next_training_sample()
+        x_train += x
+        y_train += y
+    x_train = np.array(x_train)
+    y_train = np.array(y_train)
 
-    x_train = np.array(x)
-    y_train = np.array(y)
-    print(x_train.shape)
-
+    # Train model
     model.fit(x_train, y_train)
 
 if __name__ == '__main__':
