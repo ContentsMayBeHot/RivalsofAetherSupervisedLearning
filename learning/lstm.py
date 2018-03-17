@@ -6,40 +6,45 @@ from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, Flatten
 
 import loader
 
-MODEL_FNAME = 'rival.h5'
-
 def main():
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # Turn off CPU feature warnings
-    batch_size = 1
+    # Turn off CPU feature warnings
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+    # Data attributes
     input_shape = (135, 240, 3)
-    num_classes = 26
-    num_batches = 2
+    classes = 26
+    # Output file
+    model_fname = 'rival.h5'
+    # Data flow control
+    epochs = 3
+    batch_size = 5
 
     # Initialize loader
-    roa = loader.ReplayLoader()
-    roa.load_training()
-    roa.load_testing()
+    roa = loader.ROALoader(autoload_training=True, autoload_testing=True)
 
     # Compile model
     model = Sequential()
     model.add(Dense(units=32, input_shape=input_shape))
-    model.add(Dense(units=10))
+    model.add(Dense(units=32, activation='sigmoid'))
     model.add(Flatten())
-    model.add(Dense(units=num_classes))
+    model.add(Dense(units=classes, activation='sigmoid'))
     model.compile(optimizer='rmsprop',
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
 
     # Train model
-    x_train, y_train = roa.next_training_batch(n=num_batches)
-    model.fit(x_train, y_train)
+    for e in range(epochs):
+        print('Run [{}/{}]'.format(e+1, epochs))
+        (x_train, y_train) = roa.next_testing_batch(n=batch_size)
+        if y_train.size == 0:
+            break
+        model.train_on_batch(x_train, y_train)
 
     # Test model
-    x_test, y_test = roa.next_testing_batch(n=num_batches)
+    x_test, y_test = roa.next_testing_batch(n=batch_size)
     model.evaluate(x_test, y_test)
 
     # Save model
-    model.save(MODEL_FNAME)
+    model.save(model_fname)
 
 if __name__ == '__main__':
     main()

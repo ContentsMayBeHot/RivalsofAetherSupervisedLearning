@@ -5,75 +5,117 @@ import shutil
 
 import RivalsOfAetherSync.roasync.roasync as roasync
 
-# Reference: https://github.com/sorki/python-mnist/blob/master/mnist/loader.py
-class ReplayLoader:
-    def __init__(self):
+from keras.utils import Sequence
+
+def load_set(set_apath):
+    '''Load paths to all frame and label data for a given set'''
+    xset = []
+    xset_apath = os.path.join(set_apath, 'frames')
+    xset = [
+        os.path.join(xset_apath, xdir_dname)
+        for xdir_dname in listdir_subdir_only(xset_apath)
+        ]
+    yset = []
+    yset_apath = os.path.join(set_apath, 'labels')
+    yset = [
+        os.path.join(yset_apath, ydir_dname)
+        for ydir_dname in listdir_subdir_only(yset_apath)
+    ]
+    return (xset, yset)
+
+def unpack_sample(xdir_apath, ydir_apath):
+    '''Get the synced x and y data for a collection of frames and labels'''
+    ydir = listdir_np_only(ydir_apath)
+    y_fname = ydir[0]
+    y_apath = os.path.join(ydir_apath, y_fname)
+    synced = roasync.SyncedReplay()
+    synced.create_sync_from_npys(xdir_apath, y_apath)
+    x = []
+    y = []
+    # For each synced frame in the replay
+    for pair in synced.synced_frames:
+        frame = pair.frame
+        label = pair.actions
+        if label is None:
+            label = list(np.zeros(26))
+        else:
+            label = list(label)
+        x.append(frame) # shape: (135, 240, 3)
+        y.append(label) # shape: (26,)
+    return (x, y)
+
+def listdir_subdir_only(apath):
+    '''listdir filtered to only get folders'''
+    return [
+        dirent for dirent in os.listdir(apath)
+        if os.path.isdir(os.path.join(apath, dirent))
+    ]
+
+def listdir_np_only(apath):
+    '''listdir filtered to only get numpy pickles'''
+    return [
+        dirent for dirent in os.listdir(apath)
+        if os.path.isfile(os.path.join(apath, dirent))
+        and (dirent.endswith('np') or dirent.endswith('npy'))
+        ]
+
+class ROASequence(Sequence):
+    def __init__(self, x_set, y_set, batch_size):
+        self.x = x_set
+        self.y = y_set
+        self.batch_size = batch_size
+
+    def __len__(self):
+        return np.ceil(len(self.x) / float(self.batch_size))
+
+    def __getitem__(self, idx):
+        x_paths = self.x[idx*self.batch_size : (idx+1)*self.batch_size]
+        y_paths = self.y[idx*self.batch_size : (idx+1)*self.batch_size]
+        batch_x = []
+        batch_y = []
+        for xpath,ypath in zip(x_paths, y_paths):
+            x,y = unpack_sample(xpath, ypath)
+            batch_x += x
+            batch_y += y
+        return np.array(batch_x), np.array(batch_y)
+
+class ROALoader:
+    def __init__(self, autoload_training=False, autoload_testing=False):
         self.config = configparser.ConfigParser()
         self.config.read('config.ini')
 
+        # Initialize sets
         self.x_train = []
         self.y_train = []
-        self.train_size = 0
         self.x_test = []
         self.y_test = []
-        self.test_size = 0
 
-    def __load__(self, set_apath):
-        '''Load paths to all frame and label data for a given set'''
-        xset = []
-        xset_apath = os.path.join(set_apath, 'frames')
-        xset = [
-            os.path.join(xset_apath, xdir_dname)
-            for xdir_dname in self.__listdir_subdir_only(xset_apath)
-            ]
-        yset = []
-        yset_apath = os.path.join(set_apath, 'labels')
-        yset = [
-            os.path.join(yset_apath, ydir_dname)
-            for ydir_dname in self.__listdir_subdir_only(yset_apath)
-        ]
-        return (xset, yset)
+        # Quick load
+        if autoload_training:
+            self.load_training_set()
+        if autoload_testing:
+            self.load_testing_set()
 
-    def load_training(self):
+    def load_training_set(self):
         '''Load paths to all frame and label data for the training set'''
         set_apath = self.config['SETS']['PathToTraining']
-        (self.x_train, self.y_train) = self.__load__(set_apath)
-        self.train_size = len(self.x_train)
+        (self.x_train, self.y_train) = load_set(set_apath)
 
-    def load_testing(self):
+    def load_testing_set(self):
         '''Load paths to all frame and label data for the testing set'''
         set_apath = self.config['SETS']['PathToTesting']
-        (self.x_test, self.y_test) = self.__load__(set_apath)
-        self.test_size = len(self.x_test)
-
-    def __unpack_sample__(self, xdir_apath, ydir_apath):
-        '''Get the synced x and y data for a collection of frames and labels'''
-        ydir = self.__listdir_np_only__(ydir_apath)
-        y_fname = ydir[0]
-        y_apath = os.path.join(ydir_apath, y_fname)
-        synced = roasync.SyncedReplay()
-        synced.create_sync_from_npys(xdir_apath, y_apath)
-        x = []
-        y = []
-        # For each synced frame in the replay
-        for pair in synced.synced_frames:
-            frame = pair.frame
-            label = pair.actions
-            if label is None:
-                label = list(np.zeros(26))
-            else:
-                label = list(label)
-            x.append(frame) # shape: (135, 240, 3)
-            y.append(label) # shape: (26,)
-        return (x, y)
+        (self.x_test, self.y_test) = load_set(set_apath)
 
     def __next_batch__(self, x_set, y_set, n=1):
+        '''Load batch from given sets'''
         batch_x = []
         batch_y = []
         for i in range(n):
+            if not x_set or not y_set:
+                break
             xdir_apath = x_set.pop()
             ydir_apath = y_set.pop()
-            (x,y) = self.__unpack_sample__(xdir_apath, ydir_apath)
+            (x,y) = unpack_sample(xdir_apath, ydir_apath)
             batch_x += x
             batch_y += y
         batch_x = np.array(batch_x)
@@ -88,17 +130,13 @@ class ReplayLoader:
         '''Load a batch of synced x and y data from the testing set'''
         return self.__next_batch__(self.x_test, self.y_test, n=n)
 
-    def __listdir_subdir_only(self, apath):
-        '''listdir filtered to only get folders'''
-        return [
-            dirent for dirent in os.listdir(apath)
-            if os.path.isdir(os.path.join(apath, dirent))
-        ]
+    def __get_sequence__(self, x_set, y_set, batch_size=1):
+        return ROASequence(x_set, y_set, batch_size=batch_size)
 
-    def __listdir_np_only__(self, apath):
-        '''listdir filtered to only get numpy pickles'''
-        return [
-            dirent for dirent in os.listdir(apath)
-            if os.path.isfile(os.path.join(apath, dirent))
-            and (dirent.endswith('np') or dirent.endswith('npy'))
-            ]
+    def get_training_sequence(self, batch_size=1):
+        return self.__get_sequence__(self.x_train, self.y_train,
+                                     batch_size=batch_size)
+
+    def get_testing_sequence(self, batch_size=1):
+        return self.__get_sequence__(self.x_test, self.y_test,
+                                     batch_size=batch_size)
