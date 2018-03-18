@@ -15,7 +15,6 @@ def main():
     # Output file
     model_fname = 'rival.h5'
     # Data flow control
-    batches = 3
     batch_size = 1
 
     # Initialize loader
@@ -33,17 +32,21 @@ def main():
 
     # Train model
     roa.load_training_set()
-    for i in range(batches):
-        print('Training [{}/{}]'.format(i, batches))
-        x, y = roa.next_training_batch(n=batch_size)
-        model.fit(x, y)
+    seq = roa.get_training_sequence(batch_size=batch_size)
+    model.fit_generator(seq)
+    #for i in range(batches):
+    #    print('Training [{}/{}]'.format(i+1, batches))
+    #    x, y = roa.next_training_batch(n=batch_size)
+    #    model.fit(x, y)
 
     # Test model
     roa.load_testing_set()
-    for i in range(batches):
-        print('Testing [{}/{}]'.format(i+1, batches))
-        x, y = roa.next_testing_batch(n=batch_size)
-        model.evaluate(x, y)
+    seq = roa.get_testing_sequence(batch_size=batch_size)
+    model.evaluate_generator(seq)
+    #for i in range(batches):
+    #    print('Testing [{}/{}]'.format(i+1, batches))
+    #    x, y = roa.next_testing_batch(n=batch_size)
+    #    model.evaluate(x, y)
 
     # Save model
     model.save(model_fname)
