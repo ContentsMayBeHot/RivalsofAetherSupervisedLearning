@@ -41,10 +41,6 @@ def unpack_sample(xdir_apath, ydir_apath):
     for pair in synced.synced_frames:
         frame = rgb2gray(pair.frame)
         label = pair.actions
-        if label is None:
-            label = list(np.zeros(26))
-        else:
-            label = list(label)
         x.append(frame) # shape: (135, 240, 3)
         y.append(label) # shape: (26,)
     return (x, y)
@@ -74,6 +70,7 @@ class ROASequence(Sequence):
         return int(np.ceil(len(self.x) / float(self.batch_size)))
 
     def __getitem__(self, idx):
+        print('seq: getting item')
         x_paths = self.x[idx*self.batch_size : (idx+1)*self.batch_size]
         y_paths = self.y[idx*self.batch_size : (idx+1)*self.batch_size]
         batch_x = []
