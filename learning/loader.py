@@ -2,11 +2,15 @@ import configparser
 import os
 import numpy as np
 import shutil
-import gc
 
 import RivalsOfAetherSync.roasync.roasync as roasync
 
 from keras.utils import Sequence
+
+def rgb2gray(rgb):
+    # https://stackoverflow.com/a/12201744
+    # Reduces dimensions from (135, 240, 3) to (135, 240)
+    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
 
 def load_set(set_apath):
     '''Load paths to all frame and label data for a given set'''
@@ -35,7 +39,7 @@ def unpack_sample(xdir_apath, ydir_apath):
     y = []
     # For each synced frame in the replay
     for pair in synced.synced_frames:
-        frame = pair.frame
+        frame = rgb2gray(pair.frame)
         label = pair.actions
         if label is None:
             label = list(np.zeros(26))
@@ -101,7 +105,6 @@ class ROALoader:
             batch_y += y
         batch_x = np.array(batch_x)
         batch_y = np.array(batch_y)
-        gc.collect()
         return (batch_x, batch_y)
 
     def next_training_batch(self, n=1):

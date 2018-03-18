@@ -10,7 +10,7 @@ def main():
     # Turn off CPU feature warnings
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     # Data attributes
-    input_shape = (135, 240, 3)
+    input_shape = (135, 240)
     classes = 26
     # Output file
     model_fname = 'rival.h5'
@@ -26,7 +26,7 @@ def main():
     model.add(Dense(units=32, input_shape=input_shape))
     model.add(Dense(units=10))
     model.add(Flatten())
-    model.add(Dense(units=classes))
+    model.add(Dense(units=classes, activation='sigmoid'))
     model.compile(optimizer='rmsprop',
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
@@ -43,7 +43,7 @@ def main():
     for i in range(batches):
         print('Testing [{}/{}]'.format(i+1, batches))
         x, y = roa.next_testing_batch(n=batch_size)
-        model.fit(x, y)
+        model.evaluate(x, y)
 
     # Save model
     model.save(model_fname)
