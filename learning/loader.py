@@ -64,6 +64,26 @@ def listdir_np_only(apath):
         and (dirent.endswith('np') or dirent.endswith('npy'))
         ]
 
+class ROASequence(Sequence):
+    def __init__(self, x_set, y_set, batch_size):
+        self.x = x_set
+        self.y = y_set
+        self.batch_size = batch_size
+
+    def __len__(self):
+        return int(np.ceil(len(self.x) / float(self.batch_size)))
+
+    def __getitem__(self, idx):
+        x_paths = self.x[idx*self.batch_size : (idx+1)*self.batch_size]
+        y_paths = self.y[idx*self.batch_size : (idx+1)*self.batch_size]
+        batch_x = []
+        batch_y = []
+        for xpath,ypath in zip(x_paths, y_paths):
+            x, y = unpack_sample(xpath, ypath)
+            batch_x += x
+            batch_y += y
+        return np.array(batch_x), np.array(batch_y)
+
 class ROALoader:
     def __init__(self, autoload_training=False, autoload_testing=False):
         self.config = configparser.ConfigParser()
