@@ -55,7 +55,7 @@ Substitute the path given above with the path to your game's replays folder. For
 
 <h3>Preparing your replay files</h3>
 
-Move all of your _roa_ files to the game's replays folder. Next, run **python /plugins/SerpentRivalsofAetherGameAgentPlugin/files/helpers/manager/replaymanager.py** to automatically move your replay files into folders corresponding with their respective game versions. This will result in a directory tree that looks something like this:
+Move all of your _roa_ files to the game's replays folder. Next, run **python /plugins/SerpentRivalsofAetherGameAgentPlugin/files/helpers/manager/replaymanager.py --sort-replays** to automatically move your replay files into folders corresponding with their respective game versions. This will result in a directory tree that looks something like this:
 
 ```
 ├── replays
@@ -102,6 +102,44 @@ Make sure Steam is running and _Rivals of Aether_ is installed. We recommend tha
 │           └── roa_2.npy
 ```
 
-Avoid taking focus away from the game's window while the frame collector agent is running. If you need to stop the agent, bring Anaconda Prompt into focus. Doing so will automatically pause the agent. Next, press CTRL+C to terminate the agent. If a replay was in progress, then be sure to delete the corresponding frames and labels folders.
+Avoid taking focus away from the game's window while the frame collector agent is running. If you need to stop the agent, bring Anaconda Prompt into focus. Doing so will automatically pause the agent. Next, press CTRL+C to terminate the agent. If a replay was in progress, then be sure to delete the corresponding frames and labels folders. Otherwise, these will be skipped (and thus left unfinished) when you next run the collector agent.
 
 Please be aware that the collector agent dumps about 1 GB of frame buffer data for every 4 minutes of playback. During our  initial experiments we processed just over 330 replay files, which resulted in more 40 GB of frame buffer data. If you are concerned about space requirements, you can set up a symbolic link from _/.../replays/frames_ to a different storage device with a higher capacity.
+
+<h3>Training the model</h3>
+
+Run **python /plugins/SerpentRivalsofAetherGameAgentPlugin/files/helpers/manager/replaymanager.py --make-sets** to randomly assign your frames and labels into training and testing sets. This will result in the following directory structure:
+
+```
+├── replays
+│   ├── 00_15_07
+│   ...
+│   ├── 01_02_02
+│   ├── frames
+│   ├── labels
+|   └── sets
+|       ├── testing
+│       │   ├── frames
+│       │   └── labels
+|       └── training
+│           ├── frames
+│           └── labels
+```
+
+Due to performance considerations, data will be moved rather than copied. Therefore, your _replays/frames_ and _replays/labels_ folders will no longer contain any files when this operation finishes; all files will move to either _replays/sets/testing_ or _replays/sets/training_.
+
+Clone the [Rivals of Aether supervised learning repository](https://github.com/ContentsMayBeHot/RivalsofAetherSupervisedLearning). As before, enter the repository and run **git submodule update --init --recursive** in order to ensure that all submodules are loaded. Next, open _/.../RivalsofAetherSupervisedLearning/learning/config.ini_ and fill in the following fields:
+
+```
+[SETS]
+PathToTraining = /.../training/
+PathToTesting = /.../testing/
+```
+
+Next, run **python /.../RivalsofAetherSupervisedLearning/learning/lstm.py** to train and then test the model. If you wish to write your own model, consider taking advantage of the features offered by loader.py.
+
+Your trained model will be saved to _/.../RivalsofAetherSupervisedLearning/learning/rival.h5_. You can copy this file into _/.../SerpentAI/plugins/SerpentRivalsofAetherGameAgentPlugin/files/ml_models_ to use it with the provided game agent plugin.
+
+<h3>Using the model</h3>
+
+In Anaconda Prompt navigate to _/.../SerpentAI/_, run **serpent launch RivalsofAether**, start a match, and, finally, run **serpent play RivalsofAether SerpentRivalsofAetherGameAgent PLAY**.
