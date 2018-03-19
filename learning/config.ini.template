@@ -1,0 +1,3 @@
+[SETS]
+PathToTraining = <FILE_PATH_TO_TRAINING_SET>
+PathToTesting = <FILE_PATH_TO_TESTING_SET>

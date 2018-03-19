@@ -1,12 +1,14 @@
 import os
 import numpy as np
 import keras
+import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, Flatten
 
 import loader
 
 def main():
+    sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     # Turn off CPU feature warnings
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     # Data attributes
@@ -21,14 +23,27 @@ def main():
     roa = loader.ROALoader()
 
     # Compile model
+    # model = Sequential()
+    # model.add(Dense(units=32, input_shape=input_shape))
+    # model.add(Dense(units=10))
+    # model.add(Flatten())
+    # model.add(Dense(units=classes, activation='relu'))
+    # model.add(Dense(units=classes, activation='relu'))
+    # model.add(Dense(units=classes, activation='sigmoid'))
+    # model.compile(optimizer='rmsprop',
+    #               loss='categorical_crossentropy',
+    #               metrics=['accuracy'])
+
+    #LSTM Test
     model = Sequential()
-    model.add(Dense(units=32, input_shape=input_shape))
-    model.add(Dense(units=10))
+    model.add(LSTM(classes, input_shape=input_shape, return_sequences=True))
+    model.add(Dropout(0.1))
+    model.add(LSTM(classes, input_shape=input_shape, return_sequences=True))
+    model.add(Dropout(0.1))
     model.add(Flatten())
-    model.add(Dense(units=classes, activation='sigmoid'))
-    model.compile(optimizer='rmsprop',
-                  loss='categorical_crossentropy',
-                  metrics=['accuracy'])
+    model.add(Dense(classes,activation='softmax'))
+
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     # Train model
     roa.load_training_set()

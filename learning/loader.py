@@ -70,7 +70,6 @@ class ROASequence(Sequence):
         return int(np.ceil(len(self.x) / float(self.batch_size)))
 
     def __getitem__(self, idx):
-        print('seq: getting item')
         x_paths = self.x[idx*self.batch_size : (idx+1)*self.batch_size]
         y_paths = self.y[idx*self.batch_size : (idx+1)*self.batch_size]
         batch_x = []
