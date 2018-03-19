@@ -13,7 +13,7 @@ def main():
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     # Data attributes
     input_shape = (135, 240)
-    classes = 26
+    classes = 9
     # Output file
     model_fname = 'rival.h5'
     # Data flow control

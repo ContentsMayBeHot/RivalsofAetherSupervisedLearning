@@ -1,4 +1,5 @@
 import configparser
+import enum
 import os
 import numpy as np
 import shutil
@@ -7,10 +8,100 @@ import RivalsOfAetherSync.roasync.roasync as roasync
 
 from keras.utils import Sequence
 
+class Actions(enum.Enum):
+    LEFT = 0
+    LEFT_TAP = 1
+    RIGHT = 2
+    RIGHT_TAP = 3
+    UP = 4
+    UP_TAP = 5
+    DOWN = 6
+    DOWN_TAP = 7
+    ATTACK = 8
+    SPECIAL = 9
+    JUMP = 10
+    DODGE = 11
+    STRONG = 12
+    STRONG_LEFT = 13
+    STRONG_RIGHT = 14
+    STRONG_UP = 15
+    STRONG_DOWN = 16
+    ANG_RIGHT = 17
+    ANG_UP_RIGHT = 18
+    ANG_UP = 19
+    ANG_UP_LEFT = 20
+    ANG_LEFT = 21
+    ANG_DOWN_LEFT = 22
+    ANG_DOWN = 23
+    ANG_DOWN_RIGHT = 24
+    ANG_TOGGLE = 25
+
+class Classes(enum.Enum):
+    LEFT = 0
+    RIGHT = 1
+    UP = 2
+    DOWN = 3
+    ATTACK = 4
+    SPECIAL = 5
+    JUMP = 6
+    DODGE = 7
+    STRONG = 8
+
 def rgb2gray(rgb):
     # https://stackoverflow.com/a/12201744
     # Reduces dimensions from (135, 240, 3) to (135, 240)
     return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
+
+def reduce_classes(y):
+    labels = np.zeros(9).tolist()
+    if (y[Actions.LEFT.value]
+        or y[Actions.LEFT_TAP.value] == 1
+        or y[Actions.STRONG_LEFT.value] == 1
+        or y[Actions.ANG_UP_LEFT.value] == 1
+        or y[Actions.ANG_DOWN_LEFT.value] == 1):
+        # Press left
+        labels[Classes.LEFT.value] = 1
+    if (y[Actions.RIGHT.value] == 1
+        or y[Actions.RIGHT_TAP.value] == 1
+        or y[Actions.STRONG_RIGHT.value] == 1
+        or y[Actions.ANG_UP_RIGHT.value] == 1
+        or y[Actions.ANG_DOWN_RIGHT.value] == 1):
+        # Press right
+        labels[Classes.RIGHT.value] = 1
+    if (y[Actions.UP.value]
+        or y[Actions.UP_TAP.value] == 1
+        or y[Actions.STRONG_UP.value] == 1
+        or y[Actions.ANG_UP_RIGHT.value] == 1
+        or y[Actions.ANG_UP_LEFT.value] == 1):
+        # Press up
+        labels[Classes.UP.value] = 1
+    if (y[Actions.DOWN.value]
+        or y[Actions.DOWN_TAP.value] == 1
+        or y[Actions.STRONG_DOWN.value] == 1
+        or y[Actions.ANG_DOWN_RIGHT.value] == 1
+        or y[Actions.ANG_DOWN_LEFT.value] == 1):
+        # Press down
+        labels[Classes.DOWN.value] = 1
+    if (y[Actions.ATTACK.value] == 1):
+        # Press attack
+        labels[Classes.ATTACK.value] = 1
+    if (y[Actions.SPECIAL.value] == 1):
+        # Press special
+        labels[Classes.SPECIAL.value] = 1
+    if (y[Actions.JUMP.value] == 1):
+        # Press jump
+        labels[Classes.JUMP.value] = 1
+    if (y[Actions.DODGE.value] == 1):
+        # Press dodge
+        labels[Classes.DODGE.value] = 1
+    if (y[Actions.STRONG.value] == 1
+        or y[Actions.STRONG_LEFT.value] == 1
+        or y[Actions.STRONG_RIGHT.value] == 1
+        or y[Actions.STRONG_UP.value] == 1
+        or y[Actions.STRONG_DOWN.value] == 1):
+        # Press STRONG
+        labels[Classes.STRONG.value] = 1
+    return np.array(labels)
 
 def load_set(set_apath):
     '''Load paths to all frame and label data for a given set'''
@@ -40,7 +131,7 @@ def unpack_sample(xdir_apath, ydir_apath):
     # For each synced frame in the replay
     for pair in synced.synced_frames:
         frame = rgb2gray(pair.frame)
-        label = pair.actions
+        label = reduce_classes(pair.actions)
         x.append(frame) # shape: (135, 240, 3)
         y.append(label) # shape: (26,)
     return (x, y)
