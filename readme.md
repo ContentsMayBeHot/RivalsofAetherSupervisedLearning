@@ -1,6 +1,8 @@
 
 <h1>Capstone Project: Supervised Learning in Rivals of Aether </h1>
 
+![ASCII art of Orcane](https://github.com/ContentsMayBeHot/RivalsofAetherSupervisedLearning/blob/master/orcane_lg.PNG)
+
 <h2>Setup</h2>
 
 <h3>Dependencies</h3>
