@@ -58,11 +58,11 @@ def rgb2gray(rgb):
 
 def reduce_classes(y):
     labels = np.zeros(9).tolist()
-    if (y[Actions.LEFT.value] or
-        y[Actions.LEFT_TAP.value] == 1 or
-        y[Actions.STRONG_LEFT.value] == 1 or
-        y[Actions.ANG_UP_LEFT.value] == 1 or
-            y[Actions.ANG_DOWN_LEFT.value] == 1):
+    if (y[Actions.LEFT.value]
+        or y[Actions.LEFT_TAP.value] == 1
+        or y[Actions.STRONG_LEFT.value] == 1
+        or y[Actions.ANG_UP_LEFT.value] == 1
+            or y[Actions.ANG_DOWN_LEFT.value] == 1):
         labels[Classes.LEFT.value] = 1
     if (y[Actions.RIGHT.value] == 1
         or y[Actions.RIGHT_TAP.value] == 1
