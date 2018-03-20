@@ -7,6 +7,7 @@ from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, Flatten
 
 import loader
 
+
 def main():
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     # Turn off CPU feature warnings
@@ -34,22 +35,23 @@ def main():
     #               loss='categorical_crossentropy',
     #               metrics=['accuracy'])
 
-    #LSTM Test
+    # LSTM Test
     model = Sequential()
     model.add(LSTM(classes, input_shape=input_shape, return_sequences=True))
     model.add(Dropout(0.1))
     model.add(LSTM(classes, input_shape=input_shape, return_sequences=True))
     model.add(Dropout(0.1))
     model.add(Flatten())
-    model.add(Dense(classes,activation='softmax'))
-
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.add(Dense(classes, activation='softmax'))
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='adam',
+                  metrics=['accuracy'])
 
     # Train model
     roa.load_training_set()
     seq = roa.get_training_sequence(batch_size=batch_size)
     model.fit_generator(seq)
-    #for i in range(batches):
+    # for i in range(batches):
     #    print('Training [{}/{}]'.format(i+1, batches))
     #    x, y = roa.next_training_batch(n=batch_size)
     #    model.fit(x, y)
@@ -58,13 +60,14 @@ def main():
     roa.load_testing_set()
     seq = roa.get_testing_sequence(batch_size=batch_size)
     model.evaluate_generator(seq)
-    #for i in range(batches):
+    # for i in range(batches):
     #    print('Testing [{}/{}]'.format(i+1, batches))
     #    x, y = roa.next_testing_batch(n=batch_size)
     #    model.evaluate(x, y)
 
     # Save model
     model.save(model_fname)
+
 
 if __name__ == '__main__':
     main()
