@@ -3,17 +3,18 @@ import numpy as np
 import keras
 import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, Flatten
+from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, Flatten, Conv2D, MaxPooling2D
 
 import loader
 
 
 def main():
-    sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     # Turn off CPU feature warnings
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+    # Display device information
+    sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     # Data attributes
-    input_shape = (135, 240)
+    input_shape = (135, 240, 1)
     classes = 9
     # Output file
     model_fname = 'rival.h5'
@@ -23,7 +24,7 @@ def main():
     # Initialize loader
     roa = loader.ROALoader()
 
-    # Compile model
+    # Basic test
     # model = Sequential()
     # model.add(Dense(units=32, input_shape=input_shape))
     # model.add(Dense(units=10))
@@ -35,13 +36,32 @@ def main():
     #               loss='categorical_crossentropy',
     #               metrics=['accuracy'])
 
-    # LSTM Test
+    # LSTM test
+    # model = Sequential()
+    # model.add(LSTM(classes, input_shape=input_shape, return_sequences=True))
+    # model.add(Dropout(0.1))
+    # model.add(LSTM(classes, input_shape=input_shape, return_sequences=True))
+    # model.add(Dropout(0.1))
+    # model.add(Flatten())
+    # model.add(Dense(classes, activation='softmax'))
+    # model.compile(loss='categorical_crossentropy',
+    #               optimizer='adam',
+    #               metrics=['accuracy'])
+
+    # Conv2D test
     model = Sequential()
-    model.add(LSTM(classes, input_shape=input_shape, return_sequences=True))
-    model.add(Dropout(0.1))
-    model.add(LSTM(classes, input_shape=input_shape, return_sequences=True))
-    model.add(Dropout(0.1))
+    model.add(Conv2D(4,
+                     kernel_size=(3, 3),
+                     activation='relu',
+                     input_shape=input_shape))
+    model.add(Conv2D(8,
+                    kernel_size=(3, 3),
+                    activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
     model.add(Flatten())
+    model.add(Dense(16, activation='relu'))
+    model.add(Dropout(0.5))
     model.add(Dense(classes, activation='softmax'))
     model.compile(loss='categorical_crossentropy',
                   optimizer='adam',
