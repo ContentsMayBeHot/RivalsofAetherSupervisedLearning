@@ -164,23 +164,35 @@ def listdir_np_only(apath):
 
 class ROASequence(Sequence):
     def __init__(self, x_set, y_set, batch_size):
-        self.x = x_set
-        self.y = y_set
+        self.x = x_set  # all paths to x datas
+        self.y = y_set  # all paths to y datas
         self.batch_size = batch_size
+        self.current_batch_x = None  # all of the x values for current replay
+        self.current_batch_y = None  # all of the y values for current replay
+        self.__loadnextsample__()
 
     def __len__(self):
         return int(np.ceil(len(self.x) / float(self.batch_size)))
 
+    def __loadnextsample__(self):
+        self.current_batch_x, self.current_batch_y = unpack_sample(self.x.pop(), self.y.pop())  # noqa
+
     def __getitem__(self, idx):
-        x_paths = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
-        y_paths = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
         batch_x = []
         batch_y = []
-        for xpath, ypath in zip(x_paths, y_paths):
-            x, y = unpack_sample(xpath, ypath)
-            batch_x += x
-            batch_y += y
-        return np.array(batch_x), np.array(batch_y)
+
+        if not self.current_batch_x or self.current_batch_y:
+            self.__loadnextsample__()
+        return np.array(self.current_batch_x.pop()), np.array(self.current_batch_y.pop())  # noqa
+        # x_paths = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
+        # y_paths = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        # batch_x = []
+        # batch_y = []
+        # for xpath, ypath in zip(x_paths, y_paths):
+        #     x, y = unpack_sample(xpath, ypath)
+        #     batch_x += x
+        #     batch_y += y
+        # return np.array(batch_x), np.array(batch_y)
 
 
 class ROALoader:

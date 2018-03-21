@@ -3,7 +3,8 @@ import numpy as np
 import keras
 import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, Flatten, Conv2D, MaxPooling2D
+from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, Flatten
+from keras.layers import Conv2D, MaxPooling2D
 
 import loader
 
@@ -55,9 +56,9 @@ def main():
                      activation='relu',
                      input_shape=input_shape))
     model.add(Conv2D(8,
-                    kernel_size=(3, 3),
-                    activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+                     kernel_size=(3, 3),
+                     activation='relu'))
+    model.add(MaxPooling2D(pool_size=(3, 3)))
     model.add(Dropout(0.25))
     model.add(Flatten())
     model.add(Dense(16, activation='relu'))
