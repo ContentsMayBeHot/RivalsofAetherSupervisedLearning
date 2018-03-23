@@ -14,12 +14,14 @@ def main():
     # Display device information
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     # Data attributes
+    nb_timesteps = 1  # TODO: Specify this
+    img_u = 135
+    img_v = 240
+    img_channels = 1
+    input_shape = (img_u, img_v, img_channels)
+    kernel_size = (3, 3)
+    pool_size = (2, 2)
     nb_classes = 9
-    nb_timesteps = None  # TODO: Specify this
-    img_height = 135
-    img_width = 240
-    img_colors = 1
-    input_shape = (nb_timesteps, img_height, img_width, img_colors)
     # Output file
     model_fname = 'rival.h5'
     # Data flow control
@@ -28,29 +30,29 @@ def main():
     # Initialize loader
     roa = loader.ROALoader()
 
+    # Create sequential model instance
     model = Sequential()
 
-    model.add(TimeDistributed(
-        Conv2D(8, kernel_size=(2, 2), activation='relu'),
-        input_shape=input_shape))
-    model.add(TimeDistributed(
-        Conv2D(8, kernel_size=(2, 2), activation='relu')))
-    model.add(TimeDistributed(
-        MaxPooling2D(pool_size=(2, 2))))
-    model.add(TimeDistributed(
-        Dropout(0.1)))
-    model.add(TimeDistributed(
-        Flatten()
-    ))
-    model.add(LSTM(4))
-    model.add(Dense(16))
-    model.add(Dense(nb_classes))
-    model.compile(loss='categorical_crossentropy',
-                  optimizer='adam',
-                  metrics=['accuracy'])
-    model.summary()
-    quit()
-
+    # Convolutional LSTM test
+    # model.add(TimeDistributed(
+    #     Conv2D(1, kernel_size=kernel_size, activation='relu'),
+    #     input_shape=input_shape))
+    # model.add(TimeDistributed(
+    #     Conv2D(1, kernel_size=kernel_size, activation='relu')))
+    # model.add(TimeDistributed(
+    #     MaxPooling2D(pool_size=kernel_size)))
+    # model.add(TimeDistributed(
+    #     Dropout(0.1)))
+    # model.add(TimeDistributed(
+    #     Flatten()
+    # ))
+    # model.add(LSTM(1))
+    # model.add(Dense(16))
+    # model.add(Dense(nb_classes))
+    # model.compile(loss='categorical_crossentropy',
+    #               optimizer='adam',
+    #               metrics=['accuracy'])
+    # model_fname = 'rival_conv2d-lstm.h5'
 
     # Basic test
     # model.add(Dense(units=32, input_shape=input_shape))
@@ -73,24 +75,44 @@ def main():
     # model.compile(loss='categorical_crossentropy',
     #               optimizer='adam',
     #               metrics=['accuracy'])
+    # model_fname = 'rival_lstm.h5'
 
     # Conv2D test
-    #model.add(Conv2D(4,
-    #                 kernel_size=(3, 3),
-    #                 activation='relu',
-    #                 input_shape=input_shape))
-    #model.add(Conv2D(8,
-    #                kernel_size=(3, 3),
-    #                activation='relu'))
-    #model.add(MaxPooling2D(pool_size=(2, 2)))
-    #model.add(Dropout(0.25))
-    #model.add(Flatten())
-    #model.add(Dense(16, activation='relu'))
-    #model.add(Dropout(0.5))
-    #model.add(Dense(nb_classes, activation='softmax'))
-    #model.compile(loss='categorical_crossentropy',
-    #              optimizer='adam',
-    #              metrics=['accuracy'])
+    model.add(Conv2D(filters=16,
+                    kernel_size=kernel_size,
+                    activation='relu',
+                    padding='same',
+                    input_shape=input_shape))
+    model.add(Conv2D(filters=16,
+                     kernel_size=kernel_size,
+                     activation='relu'))
+    model.add(MaxPooling2D(pool_size=pool_size))
+    model.add(Dropout(0.25))
+
+    model.add(Conv2D(filters=32,
+                     kernel_size=kernel_size,
+                     activation='relu',
+                     padding='same'))
+    model.add(Conv2D(filters=32,
+                     kernel_size=kernel_size,
+                     activation='relu'))
+    model.add(MaxPooling2D(pool_size=pool_size))
+    model.add(Dropout(0.25))
+
+    model.add(Flatten())
+    model.add(Dense(units=128,
+                    activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(units=nb_classes,
+                    activation='softmax'))
+
+    model.compile(loss='categorical_crossentropy',
+                 optimizer='adam',
+                 metrics=['accuracy'])
+    model_fname = 'rival_conv2d.h5'
+
+    # Print model summary
+    model.summary()
 
     # Train model
     roa.load_training_set()

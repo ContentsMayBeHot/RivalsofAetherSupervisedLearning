@@ -55,7 +55,7 @@ def rgb2gray(rgb, keep_channels=True):
     # Reduces dimensions from (135, 240, 3) to (135, 240)
     gray = np.dot(rgb[..., :3], [0.299, 0.587, 0.114])
     if keep_channels:
-        return gray.reshape(1, 135, 240)
+        return gray.reshape(135, 240, 1)
     return gray
 
 
@@ -180,7 +180,9 @@ class ROASequence(Sequence):
             x, y = unpack_sample(xpath, ypath)
             batch_x += x
             batch_y += y
-        return np.array(batch_x), np.array(batch_y)
+        batch_x = np.array(batch_x)
+        batch_y = np.array(batch_y)
+        return batch_x, batch_y
 
 
 class ROALoader:
