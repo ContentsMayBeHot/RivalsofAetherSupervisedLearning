@@ -3,7 +3,7 @@ import numpy as np
 import keras
 import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, Flatten, Conv2D, MaxPooling2D, Reshape, GlobalAveragePooling2D
+from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, Flatten, Conv2D, MaxPooling2D, Reshape, GlobalAveragePooling2D, Conv1D, AveragePooling3D
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
 
@@ -35,7 +35,6 @@ def main():
             kernel_size=(3, 3),
             input_shape=input_shape,
             padding='same',
-            data_format='channels_last',
             return_sequences=True))
     model.add(BatchNormalization())
 
@@ -43,7 +42,6 @@ def main():
             filters=40,
             kernel_size=(3, 3),
             padding='same',
-            data_format='channels_last',
             return_sequences=True))
     model.add(BatchNormalization())
 
@@ -51,10 +49,11 @@ def main():
             filters=40,
             kernel_size=(3, 3),
             padding='same',
-            data_format='channels_last'))
+            return_sequences=True))
     model.add(BatchNormalization())
 
-    model.add(GlobalAveragePooling2D(data_format='channels_last'))
+    model.add(AveragePooling3D((1, 135, 240)))
+    model.add(Reshape((-1, 40)))
     model.add(Dense(
             units=classes,
             activation='softmax'))
