@@ -169,7 +169,7 @@ class ROASequence(Sequence):
         self.batch_size = batch_size
 
     def __len__(self):
-        return int(np.ceil(len(self.x) / float(self.batch_size)))
+        return abs(int(np.ceil(len(self.x) / float(self.batch_size))))
 
     def __getitem__(self, idx):
         x_paths = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
@@ -177,10 +177,12 @@ class ROASequence(Sequence):
         batch_x = []
         batch_y = []
         for xpath, ypath in zip(x_paths, y_paths):
-            x, y = unpack_sample(xpath, ypath)
-            batch_x += x
-            batch_y += y
-        return np.array(batch_x), np.array(batch_y)
+            sample_x, sample_y = unpack_sample(xpath, ypath)
+            batch_x.append(sample_x)
+            batch_y.append(sample_y)
+        batch_x = np.array(batch_x)
+        batch_y = np.array(batch_y)
+        return batch_x, batch_y
 
 
 class ROALoader:
