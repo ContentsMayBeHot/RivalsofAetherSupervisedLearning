@@ -9,81 +9,71 @@ from keras.layers.normalization import BatchNormalization
 
 import loader
 
+BATCH_SIZE = 1
+CLASSES = 9
+FILTERS = 4
+INPUT_SHAPE = (None, 135, 240, 1)
+POOL_SIZE = (1, 135, 240)
+KERNEL_SIZE = (3, 3)
+MODEL_FNAME = 'rival.h5'
 
 def main():
     # Turn off CPU feature warnings
     os.environ['TF_CPP_MIConvLSTM2D'] = '2'
     # Display device information
     tf.Session(config=tf.ConfigProto(log_device_placement=True))
-    # Data attributes
-    input_shape = (None, 135, 240, 1)
-    classes = 9
-    # Output file
-    model_fname = 'rival.h5'
-    # Data flow control
-    batch_size = 1
+    tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
 
-    # Initialize loader
-    roa = loader.ROALoader()
-
-    # Initialize Keras model
     model = Sequential()
-
-    # ConvLSTM test
     model.add(ConvLSTM2D(
-            filters=40,
-            kernel_size=(3, 3),
-            input_shape=input_shape,
+            filters=FILTERS,
+            kernel_size=KERNEL_SIZE,
+            input_shape=INPUT_SHAPE,
             padding='same',
             return_sequences=True))
     model.add(BatchNormalization())
-
-    model.add(ConvLSTM2D(
-            filters=40,
-            kernel_size=(3, 3),
-            padding='same',
-            return_sequences=True))
-    model.add(BatchNormalization())
-
-    model.add(ConvLSTM2D(
-            filters=40,
-            kernel_size=(3, 3),
-            padding='same',
-            return_sequences=True))
-    model.add(BatchNormalization())
-
-    model.add(AveragePooling3D((1, 135, 240)))
-    model.add(Reshape((-1, 40)))
-    model.add(Dense(
-            units=classes,
-            activation='softmax'))
-
+#     model.add(ConvLSTM2D(
+#             filters=FILTERS,
+#             kernel_size=KERNEL_SIZE,
+#             padding='same',
+#             return_sequences=True))
+#     model.add(BatchNormalization())
+#     model.add(ConvLSTM2D(
+#             filters=FILTERS,
+#             kernel_size=KERNEL_SIZE,
+#             padding='same',
+#             return_sequences=True))
+#     model.add(BatchNormalization())
+    model.add(AveragePooling3D(POOL_SIZE))
+    model.add(Reshape((-1, FILTERS)))
+    model.add(Dense(CLASSES, activation='sigmoid'))
     model.compile(
             loss='categorical_crossentropy',
             optimizer='adadelta'
     )
     model.summary()
 
-    # Train model
+    roa = loader.ROALoader()
+
+    # # Train model
     roa.load_training_set()
-    training_sequence = roa.get_training_sequence(batch_size=batch_size)
-    model.fit_generator(generator=training_sequence)
-    # for i in range(batches):
-    #    print('Training [{}/{}]'.format(i+1, batches))
-    #    x, y = roa.next_training_batch(n=batch_size)
-    #    model.fit(x, y)
+    training_sequence = roa.get_training_sequence(batch_size=BATCH_SIZE)
+    model.fit_generator(
+        generator=training_sequence,
+        max_queue_size=1,
+        workers=1,
+        verbose=2)
 
     # Test model
     roa.load_testing_set()
-    testing_sequence = roa.get_testing_sequence(batch_size=batch_size)
-    model.evaluate_generator(generator=testing_sequence)
-    # for i in range(batches):
-    #    print('Testing [{}/{}]'.format(i+1, batches))
-    #    x, y = roa.next_testing_batch(n=batch_size)
-    #    model.evaluate(x, y)
+    testing_sequence = roa.get_testing_sequence(batch_size=BATCH_SIZE)
+    model.evaluate_generator(
+        generator=testing_sequence,
+        max_queue_size=1,
+        workers=1)
 
     # Save model
-    model.save(model_fname)
+    model.save(MODEL_FNAME)
 
 
 if __name__ == '__main__':
