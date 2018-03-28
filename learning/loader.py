@@ -3,6 +3,7 @@ import enum
 import os
 import numpy as np
 import shutil
+import gc
 
 import RivalsOfAetherSync.roasync.roasync as roasync
 
@@ -137,12 +138,14 @@ def unpack_sample(xdir_apath, ydir_apath):
     x = []
     y = []
     # For each synced frame in the replay
-    for pair in synced.synced_frames:
+    for i, pair in enumerate(synced.synced_frames):
+        if i >= 100:
+            break
         frame = rgb2gray(pair.frame)
         label = reduce_classes(pair.actions)
         x.append(frame)  # shape: (135, 240, 3)
         y.append(label)  # shape: (26,)
-    return (x, y)
+    return x, y
 
 
 def listdir_subdir_only(apath):
@@ -206,11 +209,13 @@ class ROALoader:
         '''Load paths to all frame and label data for the training set'''
         set_apath = self.config['SETS']['PathToTraining']
         (self.x_train, self.y_train) = load_set(set_apath)
+        return len(self.x_train)
 
     def load_testing_set(self):
         '''Load paths to all frame and label data for the testing set'''
         set_apath = self.config['SETS']['PathToTesting']
         (self.x_test, self.y_test) = load_set(set_apath)
+        return len(self.x_test)
 
     def __next_batch__(self, x_set, y_set, n=1):
         '''Load batch from given sets'''
@@ -222,9 +227,11 @@ class ROALoader:
             xdir_apath = x_set.pop()
             ydir_apath = y_set.pop()
             (x, y) = unpack_sample(xdir_apath, ydir_apath)
-            batch_x += x
-            batch_y += y
-        return np.array(batch_x, batch_y)
+            batch_x.append(x)
+            batch_y.append(y)
+        batch_x = np.array(batch_x)
+        batch_y = np.array(batch_y)
+        return batch_x, batch_y
 
     def next_training_batch(self, n=1):
         '''Load a batch of synced x and y data from the training set'''
