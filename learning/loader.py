@@ -177,15 +177,9 @@ class ROASequence(Sequence):
         batch_x = []
         batch_y = []
         for xpath, ypath in zip(x_paths, y_paths):
-<<<<<<< HEAD
             sample_x, sample_y = unpack_sample(xpath, ypath)
             batch_x.append(sample_x)
             batch_y.append(sample_y)
-=======
-            x, y = unpack_sample(xpath, ypath)
-            batch_x += x
-            batch_y += y
->>>>>>> a47d7258de3b2142e71b216de111456831cb1926
         batch_x = np.array(batch_x)
         batch_y = np.array(batch_y)
         return batch_x, batch_y
