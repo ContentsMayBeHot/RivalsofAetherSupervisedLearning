@@ -29,46 +29,6 @@ def main():
     # Initialize Keras model
     model = Sequential()
 
-    # Basic test
-    # model.add(Dense(units=32, input_shape=input_shape))
-    # model.add(Dense(units=10))
-    # model.add(Flatten())
-    # model.add(Dense(units=classes, activation='relu'))
-    # model.add(Dense(units=classes, activation='relu'))
-    # model.add(Dense(units=classes, activation='sigmoid'))
-    # model.compile(optimizer='rmsprop',
-    #               loss='categorical_crossentropy',
-    #               metrics=['accuracy'])
-
-    # LSTM test
-    # model.add(LSTM(classes, input_shape=input_shape, return_sequences=True))
-    # model.add(Dropout(0.1))
-    # model.add(LSTM(classes, input_shape=input_shape, return_sequences=True))
-    # model.add(Dropout(0.1))
-    # model.add(Flatten())
-    # model.add(Dense(classes, activation='softmax'))
-    # model.compile(loss='categorical_crossentropy',
-    #               optimizer='adam',
-    #               metrics=['accuracy'])
-
-    # Conv2D test
-    # model.add(Conv2D(4,
-    #                  kernel_size=(3, 3),
-    #                  activation='relu',
-    #                  input_shape=input_shape))
-    # model.add(Conv2D(8,
-    #                 kernel_size=(3, 3),
-    #                 activation='relu'))
-    # model.add(MaxPooling2D(pool_size=(2, 2)))
-    # model.add(Dropout(0.25))
-    # model.add(Flatten())
-    # model.add(Dense(16, activation='relu'))
-    # model.add(Dropout(0.5))
-    # model.add(Dense(classes, activation='softmax'))
-    # model.compile(loss='categorical_crossentropy',
-    #               optimizer='adam',
-    #               metrics=['accuracy'])
-
     # ConvLSTM test
     model.add(ConvLSTM2D(
             filters=40,
