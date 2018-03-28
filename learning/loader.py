@@ -177,9 +177,15 @@ class ROASequence(Sequence):
         batch_x = []
         batch_y = []
         for xpath, ypath in zip(x_paths, y_paths):
+<<<<<<< HEAD
             sample_x, sample_y = unpack_sample(xpath, ypath)
             batch_x.append(sample_x)
             batch_y.append(sample_y)
+=======
+            x, y = unpack_sample(xpath, ypath)
+            batch_x += x
+            batch_y += y
+>>>>>>> a47d7258de3b2142e71b216de111456831cb1926
         batch_x = np.array(batch_x)
         batch_y = np.array(batch_y)
         return batch_x, batch_y
@@ -224,9 +230,7 @@ class ROALoader:
             (x, y) = unpack_sample(xdir_apath, ydir_apath)
             batch_x += x
             batch_y += y
-        batch_x = np.array(batch_x)
-        batch_y = np.array(batch_y)
-        return (batch_x, batch_y)
+        return np.array(batch_x, batch_y)
 
     def next_training_batch(self, n=1):
         '''Load a batch of synced x and y data from the training set'''
