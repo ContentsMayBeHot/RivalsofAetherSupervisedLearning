@@ -128,26 +128,6 @@ def load_set(set_apath):
     return (xset, yset)
 
 
-def unpack_sample(xdir_apath, ydir_apath):
-    '''Get the synced x and y data for a collection of frames and labels'''
-    ydir = listdir_np_only(ydir_apath)
-    y_fname = ydir[0]
-    y_apath = os.path.join(ydir_apath, y_fname)
-    synced = roasync.SyncedReplay()
-    synced.create_sync_from_npys(xdir_apath, y_apath)
-    x = []
-    y = []
-    # For each synced frame in the replay
-    for i, pair in enumerate(synced.synced_frames):
-        if i >= 100:
-            break
-        frame = rgb2gray(pair.frame)
-        label = reduce_classes(pair.actions)
-        x.append(frame)  # shape: (135, 240, 3)
-        y.append(label)  # shape: (26,)
-    return x, y
-
-
 def listdir_subdir_only(apath):
     '''listdir filtered to only get folders'''
     return [
@@ -163,29 +143,6 @@ def listdir_np_only(apath):
         if os.path.isfile(os.path.join(apath, dirent))
         and (dirent.endswith('np') or dirent.endswith('npy'))
     ]
-
-
-class ROASequence(Sequence):
-    def __init__(self, x_set, y_set, batch_size):
-        self.x = x_set
-        self.y = y_set
-        self.batch_size = batch_size
-
-    def __len__(self):
-        return abs(int(np.ceil(len(self.x) / float(self.batch_size))))
-
-    def __getitem__(self, idx):
-        x_paths = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
-        y_paths = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
-        batch_x = []
-        batch_y = []
-        for xpath, ypath in zip(x_paths, y_paths):
-            sample_x, sample_y = unpack_sample(xpath, ypath)
-            batch_x.append(sample_x)
-            batch_y.append(sample_y)
-        batch_x = np.array(batch_x)
-        batch_y = np.array(batch_y)
-        return batch_x, batch_y
 
 
 class ROALoader:
@@ -217,37 +174,48 @@ class ROALoader:
         (self.x_test, self.y_test) = load_set(set_apath)
         return len(self.x_test)
 
-    def __next_batch__(self, x_set, y_set, n=1):
+    def __unpack_sample__(self, xdir_apath, ydir_apath):
+        '''Get the synced x and y data for a collection of frames and labels'''
+        ydir = listdir_np_only(ydir_apath)
+        y_fname = ydir[0]
+        y_apath = os.path.join(ydir_apath, y_fname)
+        synced = roasync.SyncedReplay()
+        synced.create_sync_from_npys(xdir_apath, y_apath)
+        x = []
+        y = []
+        # For each synced frame in the replay
+        for i, pair in enumerate(synced.synced_frames):
+            frame = rgb2gray(pair.frame)
+            label = reduce_classes(pair.actions)
+            x.append(frame)  # shape: (135, 240, 3)
+            y.append(label)  # shape: (26,)
+        return x, y
+
+    def __next_batch__(self, x_set, y_set):
         '''Load batch from given sets'''
-        batch_x = []
-        batch_y = []
-        for i in range(n):
-            if not x_set or not y_set:
-                break
-            xdir_apath = x_set.pop()
-            ydir_apath = y_set.pop()
-            (x, y) = unpack_sample(xdir_apath, ydir_apath)
-            batch_x.append(x)
-            batch_y.append(y)
-        batch_x = np.array(batch_x)
-        batch_y = np.array(batch_y)
-        return batch_x, batch_y
+        xdir_apath = x_set.pop()
+        ydir_apath = y_set.pop()
+        if not xdir_apath or not ydir_apath:
+            return None
+        return self.__unpack_sample__(xdir_apath, ydir_apath)
 
-    def next_training_batch(self, n=1):
+    def next_training_batch(self):
         '''Load a batch of synced x and y data from the training set'''
-        return self.__next_batch__(self.x_train, self.y_train, n=n)
+        return self.__next_batch__(self.x_train, self.y_train)
 
-    def next_testing_batch(self, n=1):
+    def next_testing_batch(self):
         '''Load a batch of synced x and y data from the testing set'''
-        return self.__next_batch__(self.x_test, self.y_test, n=n)
+        return self.__next_batch__(self.x_test, self.y_test)
 
-    def __get_sequence__(self, x_set, y_set, batch_size=1):
-        return ROASequence(x_set, y_set, batch_size=batch_size)
+    def __get_count__(self, x_set):
+        xsize = 0
+        for xdir_apath in x_set:
+            if os.path.isdir(xdir_apath):
+                xsize += len(os.listdir(xdir_apath))
+        return xsize
 
-    def get_training_sequence(self, batch_size=1):
-        return self.__get_sequence__(self.x_train, self.y_train,
-                                     batch_size=batch_size)
-
-    def get_testing_sequence(self, batch_size=1):
-        return self.__get_sequence__(self.x_test, self.y_test,
-                                     batch_size=batch_size)
+    def get_training_count(self):
+        return self.__get_count__(self.x_train)
+    
+    def get_testing_count(self):
+        return self.__get_count__(self.x_test)
