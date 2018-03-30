@@ -77,10 +77,10 @@ def main():
             x = np.array(x)  # (frames, 135, 240, 1)
             y = np.array(y)  # (frames, 9)
             # Get clips of the replay
-            for j in range(0, x.shape[0], 100):
-                x_clip = x[j:j+100]
-                y_clip = y[j:j+100]
-                if x_clip.shape[0] < 100:
+            for j in range(0, x.shape[0], CLIP_LENGTH):
+                x_clip = x[j:j+CLIP_LENGTH]
+                y_clip = y[j:j+CLIP_LENGTH]
+                if x_clip.shape[0] < CLIP_LENGTH:
                     x_clip, y_clip = pad_clip(x_clip, y_clip)
                 scalars = model.train_on_batch(x_clip, y_clip)
             # Reset LSTM for next video
