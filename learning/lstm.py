@@ -60,10 +60,10 @@ def main():
     model.summary()
     quit()
 
-    Instantiate batch loader
+    # Instantiate batch loader
     roa = ROALoader()
 
-    # # Train model
+    # Train model
     n = roa.load_training_set()
     for e in range(EPOCHS):
         print('Epoch: {}/{}'.format(e+1, EPOCHS))
