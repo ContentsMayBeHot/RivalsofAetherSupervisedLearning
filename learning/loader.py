@@ -51,13 +51,11 @@ class Classes(enum.Enum):
     STRONG = 8
 
 
-def rgb2gray(rgb, keep_channels=True):
+def rgb2gray(rgb):
     # https://stackoverflow.com/a/12201744
     # Reduces dimensions from (135, 240, 3) to (135, 240)
     gray = np.dot(rgb[..., :3], [0.299, 0.587, 0.114])
-    if keep_channels:
-        return gray.reshape(135, 240, 1)
-    return gray
+    return gray.reshape(135, 240, 1)
 
 
 def reduce_classes(y):
