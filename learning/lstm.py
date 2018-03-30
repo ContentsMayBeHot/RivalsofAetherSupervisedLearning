@@ -60,8 +60,8 @@ def main():
     model.summary()
     quit()
 
+    Instantiate batch loader
     roa = ROALoader()
-    empty_clip = 
 
     # # Train model
     n = roa.load_training_set()
