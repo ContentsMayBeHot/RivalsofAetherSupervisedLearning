@@ -1,11 +1,10 @@
-import configparser
 import enum
 import os
 import numpy as np
 import shutil
 import gc
 
-import RivalsOfAetherSync.roasync.roasync as roasync
+from .RivalsOfAetherSync.roasync import roasync as roasync
 
 from keras.utils import Sequence
 
@@ -109,23 +108,6 @@ def reduce_classes(y):
     return np.array(labels)
 
 
-def load_set(set_apath):
-    '''Load paths to all frame and label data for a given set'''
-    xset = []
-    xset_apath = os.path.join(set_apath, 'frames')
-    xset = [
-        os.path.join(xset_apath, xdir_dname)
-        for xdir_dname in listdir_subdir_only(xset_apath)
-    ]
-    yset = []
-    yset_apath = os.path.join(set_apath, 'labels')
-    yset = [
-        os.path.join(yset_apath, ydir_dname)
-        for ydir_dname in listdir_subdir_only(yset_apath)
-    ]
-    return (xset, yset)
-
-
 def listdir_subdir_only(apath):
     '''listdir filtered to only get folders'''
     return [
@@ -144,32 +126,37 @@ def listdir_np_only(apath):
 
 
 class ROALoader:
-    def __init__(self, autoload_training=False, autoload_testing=False):
-        self.config = configparser.ConfigParser()
-        self.config.read('config.ini')
-
+    def __init__(self):
         # Initialize sets
         self.x_train = []
         self.y_train = []
         self.x_test = []
         self.y_test = []
 
-        # Quick load
-        if autoload_training:
-            self.load_training_set()
-        if autoload_testing:
-            self.load_testing_set()
+    def __load_set__(self, set_path):
+        '''Load paths to all frame and label data for a given set'''
+        xset = []
+        xset_apath = os.path.join(set_path, 'frames')
+        xset = [
+            os.path.join(xset_apath, xdir_dname)
+            for xdir_dname in listdir_subdir_only(xset_apath)
+        ]
+        yset = []
+        yset_apath = os.path.join(set_path, 'labels')
+        yset = [
+            os.path.join(yset_apath, ydir_dname)
+            for ydir_dname in listdir_subdir_only(yset_apath)
+        ]
+        return (xset, yset)
 
-    def load_training_set(self):
+    def load_training_set(self, set_apath):
         '''Load paths to all frame and label data for the training set'''
-        set_apath = self.config['SETS']['PathToTraining']
-        (self.x_train, self.y_train) = load_set(set_apath)
+        self.x_train, self.y_train = self.__load_set__(set_apath)
         return len(self.x_train)
 
-    def load_testing_set(self):
+    def load_testing_set(self, set_apath):
         '''Load paths to all frame and label data for the testing set'''
-        set_apath = self.config['SETS']['PathToTesting']
-        (self.x_test, self.y_test) = load_set(set_apath)
+        self.x_test, self.y_test = self.__load_set__(set_apath)
         return len(self.x_test)
 
     def __unpack_sample__(self, xdir_apath, ydir_apath):
@@ -182,7 +169,7 @@ class ROALoader:
         x = []
         y = []
         # For each synced frame in the replay
-        for i, pair in enumerate(synced.synced_frames):
+        for pair in synced.synced_frames:
             frame = rgb2gray(pair.frame)
             label = reduce_classes(pair.actions)
             x.append(frame)  # shape: (135, 240, 3)

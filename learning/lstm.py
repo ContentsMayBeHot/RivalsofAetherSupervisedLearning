@@ -1,3 +1,4 @@
+import configparser
 import os
 import numpy as np
 import keras
@@ -33,6 +34,9 @@ def pad_clip(x_clip, y_clip):
     return padded_x, padded_y
 
 def main():
+    config = configparser.ConfigParser()
+    config.read(os.path.join('..', 'config.ini'))
+
     # Turn off CPU feature warnings
     os.environ['TF_CPP_MIConvLSTM2D'] = '2'
     # Display device information
@@ -64,7 +68,8 @@ def main():
     roa = ROALoader()
 
     # Train model
-    n = roa.load_training_set()
+    training_set_path = config['SETS']['PathToTraining']
+    n = roa.load_training_set(training_set_path)
     for e in range(EPOCHS):
         print('Epoch: {}/{}'.format(e+1, EPOCHS))
         for i in range(n):
@@ -87,7 +92,8 @@ def main():
             model.reset_states()
 
     # Test model
-    roa.load_testing_set()
+    testing_set_path = config['SETS']['PathToTesting']
+    roa.load_testing_set(testing_set_path)
     # TODO Testing loop
 
     # Save model

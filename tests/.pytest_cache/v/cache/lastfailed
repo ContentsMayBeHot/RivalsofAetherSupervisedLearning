@@ -1,0 +1,4 @@
+{
+  "test_loader.py::test_get_clips": true,
+  "test_loader.py::test_pad_clip": true
+}
