@@ -21,7 +21,8 @@ IMG_C = 1
 CLIP_LENGTH = 100
 X_CLIP_SHAPE = (CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
 Y_CLIP_SHAPE = (CLIP_LENGTH, CLASSES)
-BATCH_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
+X_BATCH_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
+Y_BATCH_SHAPE = (1, CLIP_LENGTH, CLASSES)
 
 FILTERS = 8
 POOL_SIZE = (1, 135, 240)
@@ -41,7 +42,7 @@ def main():
     model.add(ConvLSTM2D(
             filters=FILTERS,
             kernel_size=KERNEL_SIZE,
-            batch_input_shape=BATCH_SHAPE,
+            batch_input_shape=X_BATCH_SHAPE,
             data_format='channels_last',
             padding='same',
             return_sequences=True,
@@ -72,18 +73,20 @@ def main():
             if not batch:
                 break
             x, y = batch
-            x = np.array(x, dtype=np.int32)  # (frames, 135, 240, 1)
-            y = np.array(y, dtype=np.int32)  # (frames, 9)
+            x = np.array(x, dtype=np.int32)
+            y = np.array(y, dtype=np.int32)
             # Get clips of the replay
             for j in range(0, x.shape[0], CLIP_LENGTH):
                 x_clip = x[j:j+CLIP_LENGTH]
                 y_clip = y[j:j+CLIP_LENGTH]
-                print('\t\t', (x_clip.shape), x_clip.dtype, '\t', y_clip.shape, y_clip.dtype)
+                # Check if clip is required length
                 if x_clip.shape[0] < CLIP_LENGTH:
+                    continue # Drop clip
                     x_clip, y_clip = utls.pad_clip(
                             x_clip, X_CLIP_SHAPE,
                             y_clip, Y_CLIP_SHAPE)
-                continue # SKIP TRAINING
+                x_clip = x_clip.reshape(X_BATCH_SHAPE)
+                y_clip = y_clip.reshape(Y_BATCH_SHAPE)
                 scalars = model.train_on_batch(x_clip, y_clip)
                 print(scalars)
             # Reset LSTM for next video

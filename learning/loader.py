@@ -45,7 +45,7 @@ class ROALoader:
         ydir = utls.listdir_np_only(ydir_apath)
         y_fname = ydir[0]
         y_apath = os.path.join(ydir_apath, y_fname)
-        synced = sync.SyncedReplay()
+        synced = SyncedReplay()
         synced.create_sync_from_npys(xdir_apath, y_apath)
         x = []
         y = []
