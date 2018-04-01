@@ -1,6 +1,0 @@
-[submodule "RivalsOfAetherSync"]
-	path = roasync
-	url = https://github.com/ContentsMayBeHot/RivalsOfAetherSync
-[submodule "learning/RivalsOfAetherSync"]
-	path = learning/RivalsOfAetherSync
-	url = https://github.com/ContentsMayBeHot/RivalsOfAetherSync
