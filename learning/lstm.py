@@ -9,6 +9,7 @@ from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
 
 from loader import ROALoader
+import utilities as utls
 
 EPOCHS = 1
 MODEL_FNAME = 'rival.h5'
@@ -25,13 +26,6 @@ BATCH_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
 FILTERS = 8
 POOL_SIZE = (1, 135, 240)
 KERNEL_SIZE = (3, 3)
-
-def pad_clip(x_clip, y_clip):
-    padded_x = np.zeros(CLIP_SHAPE_X)
-    padded_y = np.zeros(CLIP_SHAPE_Y)
-    padded_x[:x_clip[0],:x_clip[1],:x_clip[2],:x_clip[3]] = x_clip
-    padded_y[:y_clip[0],:y_clip[1]] = y_clip
-    return padded_x, padded_y
 
 def main():
     config = configparser.ConfigParser()
@@ -65,17 +59,17 @@ def main():
     quit()
 
     # Instantiate batch loader
-    roa = ROALoader()
+    roa_loader = ROALoader()
 
     # Train model
     training_set_path = config['SETS']['PathToTraining']
-    n = roa.load_training_set(training_set_path)
+    n = roa_loader.load_training_set(training_set_path) 
     for e in range(EPOCHS):
         print('Epoch: {}/{}'.format(e+1, EPOCHS))
         for i in range(n):
             print('\tBatch: {}/{}'.format(i+1, n))
             # Get a single replay
-            batch = roa.next_training_batch()
+            batch = roa_loader.next_training_batch()
             if not batch:
                 break
             x, y = batch
@@ -86,18 +80,22 @@ def main():
                 x_clip = x[j:j+CLIP_LENGTH]
                 y_clip = y[j:j+CLIP_LENGTH]
                 if x_clip.shape[0] < CLIP_LENGTH:
-                    x_clip, y_clip = pad_clip(x_clip, y_clip)
+                    x_clip, y_clip = utls.pad_clip(
+                            x_clip, CLIP_SHAPE_X,
+                            y_clip, CLIP_SHAPE_Y)
                 scalars = model.train_on_batch(x_clip, y_clip)
+                print(scalars)
             # Reset LSTM for next video
             model.reset_states()
 
     # Test model
     testing_set_path = config['SETS']['PathToTesting']
-    roa.load_testing_set(testing_set_path)
+    roa_loader.load_testing_set(testing_set_path)
     # TODO Testing loop
 
     # Save model
-    model.save(MODEL_FNAME)
+    model_path = os.path.join('..', 'models', MODEL_FNAME)
+    model.save(model_path)
 
 if __name__ == '__main__':
     main()

@@ -3,9 +3,14 @@ from learning import ROALoader
 
 import pytest
 
-def test_pad_clip():
+def test_load_set():
     pytest.fail('Not implemented')
 
+def test_unpack_sample():
+    pytest.fail('Not implemented')
 
-def test_get_clips():
+def test_next_batch():
+    pytest.fail('Not implemented')
+
+def test_get_count():
     pytest.fail('Not implemented')
