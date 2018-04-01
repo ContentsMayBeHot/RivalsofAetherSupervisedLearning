@@ -3,9 +3,8 @@ import os
 import numpy as np
 import shutil
 
-from . import utilities as utls
-
-from .RivalsOfAetherSync.roasync import roasync as roasync
+from sync import SyncedReplay
+import utilities as utls
 
 class ROALoader:
     def __init__(self):
@@ -29,7 +28,7 @@ class ROALoader:
             os.path.join(yset_apath, ydir_dname)
             for ydir_dname in utls.listdir_subdir_only(yset_apath)
         ]
-        return (xset, yset)
+        return xset, yset
 
     def load_training_set(self, set_apath):
         '''Load paths to all frame and label data for the training set'''
@@ -46,7 +45,7 @@ class ROALoader:
         ydir = utls.listdir_np_only(ydir_apath)
         y_fname = ydir[0]
         y_apath = os.path.join(ydir_apath, y_fname)
-        synced = roasync.SyncedReplay()
+        synced = sync.SyncedReplay()
         synced.create_sync_from_npys(xdir_apath, y_apath)
         x = []
         y = []

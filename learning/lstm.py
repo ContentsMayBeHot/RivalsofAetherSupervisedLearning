@@ -19,8 +19,8 @@ IMG_U = 135
 IMG_V = 240
 IMG_C = 1
 CLIP_LENGTH = 100
-CLIP_SHAPE_X = (CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
-CLIP_SHAPE_Y = (CLIP_LENGTH, CLASSES)
+X_CLIP_SHAPE = (CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
+Y_CLIP_SHAPE = (CLIP_LENGTH, CLASSES)
 BATCH_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
 
 FILTERS = 8
@@ -28,9 +28,9 @@ POOL_SIZE = (1, 135, 240)
 KERNEL_SIZE = (3, 3)
 
 def main():
+    # Read ini file
     config = configparser.ConfigParser()
     config.read(os.path.join('..', 'config.ini'))
-
     # Turn off CPU feature warnings
     os.environ['TF_CPP_MIConvLSTM2D'] = '2'
     # Display device information
@@ -56,7 +56,6 @@ def main():
             metrics=['accuracy']
     )
     model.summary()
-    quit()
 
     # Instantiate batch loader
     roa_loader = ROALoader()
@@ -73,16 +72,18 @@ def main():
             if not batch:
                 break
             x, y = batch
-            x = np.array(x)  # (frames, 135, 240, 1)
-            y = np.array(y)  # (frames, 9)
+            x = np.array(x, dtype=np.int32)  # (frames, 135, 240, 1)
+            y = np.array(y, dtype=np.int32)  # (frames, 9)
             # Get clips of the replay
             for j in range(0, x.shape[0], CLIP_LENGTH):
                 x_clip = x[j:j+CLIP_LENGTH]
                 y_clip = y[j:j+CLIP_LENGTH]
+                print('\t\t', (x_clip.shape), x_clip.dtype, '\t', y_clip.shape, y_clip.dtype)
                 if x_clip.shape[0] < CLIP_LENGTH:
                     x_clip, y_clip = utls.pad_clip(
-                            x_clip, CLIP_SHAPE_X,
-                            y_clip, CLIP_SHAPE_Y)
+                            x_clip, X_CLIP_SHAPE,
+                            y_clip, Y_CLIP_SHAPE)
+                continue # SKIP TRAINING
                 scalars = model.train_on_batch(x_clip, y_clip)
                 print(scalars)
             # Reset LSTM for next video

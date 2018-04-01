@@ -51,7 +51,7 @@ def rgb2gray(rgb):
     return gray.reshape(135, 240, 1)
 
 
-def downscale(img):
+def downscale_img(img):
     return None
 
 
@@ -60,8 +60,8 @@ def generate_clips(x_clip, x_clip_shape, y_clip, y_clip_shape, clip_size):
 
 
 def pad_clip(x_clip, x_clip_shape, y_clip, y_clip_shape):
-    padded_x = np.zeros(x_clip_shape)
-    padded_y = np.zeros(y_clip_shape)
+    padded_x = np.zeros(x_clip_shape, dtype=np.int32)
+    padded_y = np.zeros(y_clip_shape, dtype=np.int32)
     padded_x[:x_clip[0],:x_clip[1],:x_clip[2],:x_clip[3]] = x_clip
     padded_y[:y_clip[0],:y_clip[1]] = y_clip
     return padded_x, padded_y
@@ -115,7 +115,7 @@ def reduce_classes(y):
             or y[Actions.STRONG_DOWN.value] == 1):
         # Press STRONG
         labels[Classes.STRONG.value] = 1
-    return np.array(labels)
+    return np.array(labels, dtype=np.int32)
 
 
 def listdir_subdir_only(apath):
