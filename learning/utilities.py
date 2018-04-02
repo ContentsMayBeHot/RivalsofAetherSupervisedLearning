@@ -55,7 +55,7 @@ def downscale_img(img):
     return None
 
 
-def generate_clips(x_clip, x_clip_shape, y_clip, y_clip_shape, clip_size):
+def get_clips(batch_x, clip_x_shape, batch_y, clip_y_shape, clip_length):
     return None
 
 
