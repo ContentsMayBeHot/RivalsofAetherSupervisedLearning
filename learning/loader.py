@@ -78,7 +78,7 @@ class ROALoader:
         self.test_subprocess = mp.Process(
                 target=enqueue_samples,
                 args=(self.test_queue, self.x_test, self.y_test))
-        self.train_subprocess.start()
+        self.test_subprocess.start()
         return len(self.x_test)
 
     def next_training_batch(self):

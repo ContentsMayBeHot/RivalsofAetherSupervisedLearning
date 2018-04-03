@@ -38,6 +38,15 @@ def main():
     # Display device information
     tf.Session(config=tf.ConfigProto(log_device_placement=True))
 
+    # Instantiate batch loader
+    roa_loader = ROALoader()
+    # Load training set
+    training_set_path = config['SETS']['PathToTraining']
+    train_n = roa_loader.load_training_set(training_set_path)
+    # Load testing set
+    testing_set_path = config['SETS']['PathToTesting']
+    test_n = roa_loader.load_testing_set(testing_set_path)
+
     # Define ConvLSTM2D model
     model = Sequential()
     model.add(ConvLSTM2D(
@@ -69,16 +78,11 @@ def main():
     )  # noqa
     model.summary()
 
-    # Instantiate batch loader
-    roa_loader = ROALoader()
-
     # Train model
-    training_set_path = config['SETS']['PathToTraining']
-    n = roa_loader.load_training_set(training_set_path)
     for e in range(EPOCHS):
         print('Epoch: {}/{}'.format(e + 1, EPOCHS))
-        for i in range(n):
-            utls.print_label('\tTraining Batch', '{}/{}', [i + 1, n])
+        for i in range(train_n):
+            utls.print_label('\tTraining Batch', '{}/{}', [i + 1, train_n])
             # Get a single replay
             batch = roa_loader.next_training_batch()
             if not batch:
@@ -86,24 +90,28 @@ def main():
             batch_x, batch_y = utls.generate_batches(batch)
             timesteps = batch_x.shape[0] // 100
             # Get clips of the replay
-            clips = utls.generate_clips(batch_x, batch_y, BATCH_X_SHAPE, BATCH_Y_SHAPE, CLIP_LENGTH)  # noqa
+            clips = utls.generate_clips(
+                    batch_x, batch_y,
+                    BATCH_X_SHAPE, BATCH_Y_SHAPE,
+                    CLIP_LENGTH)  # noqa
             utls.run_method(model.train_on_batch, clips, timesteps)
             model.reset_states()
             print()
         print()
 
     # Test model
-    testing_set_path = config['SETS']['PathToTesting']
-    n = roa_loader.load_testing_set(testing_set_path)
-    for i in range(n):
-        utls.print_label('\tTesting Batch', '{}/{}', [i + 1, n])
+    for i in range(test_n):
+        utls.print_label('\tTesting Batch', '{}/{}', [i + 1, test_n])
         batch = roa_loader.next_testing_batch()
         if not batch:
             break
         batch_x, batch_y = utls.generate_batches(batch)
         timesteps = batch_x.shape[0] // 100
 
-        clips = utls.generate_clips(batch_x, batch_y, BATCH_X_SHAPE, BATCH_Y_SHAPE, CLIP_LENGTH)  # noqa
+        clips = utls.generate_clips(
+                batch_x, batch_y,
+                BATCH_X_SHAPE, BATCH_Y_SHAPE,
+                CLIP_LENGTH)  # noqa
         utls.run_method(model.test_on_batch, clips, timesteps)
         model.reset_states()
         print()
