@@ -103,7 +103,7 @@ def main():
         batch_x, batch_y = utls.generate_batches(batch)
         timesteps = batch_x.shape[0] // 100
 
-        clips = utls.generate_clips(batch_x, batch_y, BATCH_X_SHAPE, BATCH_Y_SHAPE, CLIP)  # noqa
+        clips = utls.generate_clips(batch_x, batch_y, BATCH_X_SHAPE, BATCH_Y_SHAPE, CLIP_LENGTH)  # noqa
         utls.run_method(model.test_on_batch, clips, timesteps)
         model.reset_states()
         print()

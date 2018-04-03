@@ -140,6 +140,9 @@ def generate_clips(x_data, y_data, x_clip_shape, y_clip_shape, clip_length, resh
             x_clip_shape : final shape of clip x_data (tuple)
             y_clip_shape : final shape of clip y_data (tuple)
             clip_length : number of frames in a clip
+        POST:
+            clips: list of clips where each clip is a (tuple)
+                (tuple): (x_data, y_data)
     '''
     clips = []
     for index in range(0, x_data.shape[0], clip_length):
@@ -157,6 +160,7 @@ def generate_clips(x_data, y_data, x_clip_shape, y_clip_shape, clip_length, resh
 
 
 def generate_batches(batch):
+
         batch_x, batch_y = batch
         batch_x = np.array(batch_x, dtype=np.int32)
         batch_y = np.array(batch_y, dtype=np.int32)
@@ -164,8 +168,8 @@ def generate_batches(batch):
 
 
 def print_metrics(scalars):
-    print('Loss: {0:.2f}'.format(scalars[0]), end='\t')
-    print('Accuracy: {0:.2f}'.format(scalars[1]))
+    print_label('Loss', '{0:.2f}', scalars[0], '\t')
+    print_label('Accuracy', '{0:.2f}', scalars[1], '\t')
 
 
 def print_label(label_name, format, content, end='\n'):
@@ -175,6 +179,5 @@ def print_label(label_name, format, content, end='\n'):
 def run_method(passed_method, clips, timesteps):
     for i, clip in enumerate(clips):
         print_label('\t\tClip', '{}/{}', [i + 1, timesteps], '\t')
-        # print('\t\tClip: {}/{}'.format(i + 1, timesteps), end='\t')  # noqa
         scalars = passed_method(*clip)
         print_metrics(scalars)
