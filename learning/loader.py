@@ -67,7 +67,7 @@ class ROALoader:
         self.train_queue = mp.Queue(maxsize=max_queue_size)
         self.train_subprocess = mp.Process(
                 target=enqueue_samples,
-                args=(self.train_queue, self.x_train, self.y_train, 10))
+                args=(self.train_queue, self.x_train, self.y_train))
         self.train_subprocess.start()
         return len(self.x_train)
 
@@ -77,7 +77,7 @@ class ROALoader:
         self.test_queue = mp.Queue(maxsize=max_queue_size)
         self.test_subprocess = mp.Process(
                 target=enqueue_samples,
-                args=(self.test_queue, self.x_test, self.y_test, 10))
+                args=(self.test_queue, self.x_test, self.y_test))
         self.train_subprocess.start()
         return len(self.x_test)
 
