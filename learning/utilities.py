@@ -160,11 +160,10 @@ def generate_clips(x_data, y_data, x_clip_shape, y_clip_shape, clip_length, resh
 
 
 def generate_batches(batch):
-
-        batch_x, batch_y = batch
-        batch_x = np.array(batch_x, dtype=np.int32)
-        batch_y = np.array(batch_y, dtype=np.int32)
-        return batch_x, batch_y
+    batch_x, batch_y = batch
+    batch_x = np.array(batch_x, dtype=np.int32)
+    batch_y = np.array(batch_y, dtype=np.int32)
+    return batch_x, batch_y
 
 
 def print_metrics(scalars):
@@ -172,15 +171,15 @@ def print_metrics(scalars):
     print_label('Accuracy', '{0:.2f}', scalars[1])
 
 
-def print_label(label_name, format, content, end='\n'):
+def print_label(label_name, format_string, content, end='\n'):
     if isinstance(content, list):
-        print(label_name + ": " + format.format(*content), end=end)
+        print(label_name + ": " + format_string.format(*content), end=end)
     else:
-        print(label_name + ": " + format.format(content), end=end)
+        print(label_name + ": " + format_string.format(content), end=end)
 
 
-def run_method(passed_method, clips, timesteps):
+def run_method(method, clips, timesteps):
     for i, clip in enumerate(clips):
         print_label('\t\tClip', '{}/{}', [i + 1, timesteps], '\t')
-        scalars = passed_method(*clip)
+        scalars = method(*clip)
         print_metrics(scalars)
