@@ -131,9 +131,18 @@ def listdir_np_only(apath):
     ]
 
 
-def generate_clips(x_data, y_data, x_shape, y_shape, clip_length):
+def generate_clips(x_data, y_data, x_clip_shape, y_clip_shape, clip_length, reshape_clips=True):  # noqa
+    '''
+        generate clips from a given video / label pair
+        PRE:
+            x_data : frames of a video
+            y_data : labels of a video
+            x_clip_shape : final shape of clip x_data (tuple)
+            y_clip_shape : final shape of clip y_data (tuple)
+            clip_length : number of frames in a clip
+    '''
     clips = []
-    for index in range(0, x_shape[0], clip_length):
+    for index in range(0, x_data.shape[0], clip_length):
         x_clip = batch_x[index:index + clip_length]
         y_clip = batch_y[index:index + clip_length]
 
@@ -141,4 +150,14 @@ def generate_clips(x_data, y_data, x_shape, y_shape, clip_length):
             clips.append((x_clip, y_clip))
             continue
 
+    if(reshape_clips):
+        for clip in clips:
+            clip[0] = clip[0].reshape(x_clip_shape)
+            clip[1] = clip[1].reshape(y_clip_shape)
+
     return clips
+
+
+def print_matrics(scalars):
+    print('Loss: {0:.2f}'.format(scalars[0]), end='\t')
+    print('Accuracy: {0:.2f}'.format(scalar[1]))

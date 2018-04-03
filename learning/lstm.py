@@ -72,7 +72,7 @@ def main():
 
     # Train model
     training_set_path = config['SETS']['PathToTraining']
-    n = roa_loader.load_training_set(training_set_path) 
+    n = roa_loader.load_training_set(training_set_path)
     for e in range(EPOCHS):
         print('Epoch: {}/{}'.format(e+1, EPOCHS))
         for i in range(n):
@@ -85,22 +85,12 @@ def main():
             batch_x = np.array(batch_x, dtype=np.int32)
             batch_y = np.array(batch_y, dtype=np.int32)
             # Get clips of the replay
-            for j in range(0, batch_x.shape[0], CLIP_LENGTH):
-                x_clip = batch_x[j:j+CLIP_LENGTH]
-                y_clip = batch_y[j:j+CLIP_LENGTH]
-                # Check if clip is required length
-                if x_clip.shape[0] < CLIP_LENGTH:
-                    continue
+            clips = generate_clips(batch_x, batch_y, BATCH_X_SHAPE, BATCH_Y_SHAPE)  # noqa
+            for i, clip in enumerate(clips):
                 timesteps = batch_x.shape[0] // 100
-                print('\t\tClip: {}/{}'.format((j//100)+1, timesteps), end='\t')
-                x_clip = x_clip.reshape(BATCH_X_SHAPE)
-                y_clip = y_clip.reshape(BATCH_Y_SHAPE)
-                scalars = model.train_on_batch(x_clip, y_clip)
-                loss = scalars[0]
-                accuracy = scalars[1]
-                print('Loss: {0:.2f}'.format(loss), end='\t')
-                print('Accuracy: {0:.2f}'.format(accuracy))
-            # Reset LSTM for next video
+                print('\t\tClip: {}/{}'.format((i//100)+1, timesteps), end='\t')  # noqa
+                scalars = model.train_on_batch(clip[0], clip[1])
+                print_metrics(scalars)
             model.reset_states()
             print()
         print()
@@ -116,22 +106,12 @@ def main():
         batch_x, batch_y = batch
         batch_x = np.array(batch_x, dtype=np.int32)
         batch_y = np.array(batch_y, dtype=np.int32)
-        for j in range(0, batch_x.shape, CLIP_LENGTH):
-            x_clip = batch_x[j:j+CLIP_LENGTH]
-            y_clip = batch_y[j:j+CLIP_LENGTH]
-            # Check if clip is required length
-            if x_clip.shape[0] < CLIP_LENGTH:
-                continue
+        clips = generate_clips(batch_x, batch_y, BATCH_X_SHAPE, BATCH_Y_SHAPE)  # noqa
+        for i, clip in enumerate(clips):
             timesteps = batch_x.shape[0] // 100
-            print('\t\tClip: {}/{}'.format((j//100)+1, timesteps), end='\t')
-            x_clip = x_clip.reshape(BATCH_X_SHAPE)
-            y_clip = y_clip.reshape(BATCH_Y_SHAPE)
-            scalars = model.test_on_batch(x_clip, y_clip)
-            loss = scalars[0]
-            accuracy = scalars[1]
-            print('Loss: {0:.2f}'.format(loss), end='\t')
-            print('Accuracy: {0:.2f}'.format(accuracy))
-        # Reset LSTM for next video
+            print('\t\tClip: {}/{}'.format((i//100)+1, timesteps), end='\t')  # noqa
+            scalars = model.test_on_batch(clip[0], clip[1])
+            print_metrics(scalars)
         model.reset_states()
         print()
     print()
