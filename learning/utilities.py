@@ -55,15 +55,11 @@ def downscale_img(img):
     return None
 
 
-def get_clips(batch_x, clip_x_shape, batch_y, clip_y_shape, clip_length):
-    return None
-
-
 def pad_clip(x_clip, x_clip_shape, y_clip, y_clip_shape):
     padded_x = np.zeros(x_clip_shape, dtype=np.int32)
     padded_y = np.zeros(y_clip_shape, dtype=np.int32)
-    padded_x[:x_clip[0],:x_clip[1],:x_clip[2],:x_clip[3]] = x_clip
-    padded_y[:y_clip[0],:y_clip[1]] = y_clip
+    padded_x[:x_clip[0], :x_clip[1], :x_clip[2], :x_clip[3]] = x_clip
+    padded_y[:y_clip[0], :y_clip[1]] = y_clip
     return padded_x, padded_y
 
 
@@ -133,3 +129,58 @@ def listdir_np_only(apath):
         if os.path.isfile(os.path.join(apath, dirent))
         and (dirent.endswith('np') or dirent.endswith('npy'))
     ]
+
+
+def generate_clips(x_data, y_data, x_clip_shape, y_clip_shape, clip_length, reshape_clips=True):  # noqa
+    '''
+        generate clips from a given video / label pair
+        PRE:
+            x_data : frames of a video
+            y_data : labels of a video
+            x_clip_shape : final shape of clip x_data (tuple)
+            y_clip_shape : final shape of clip y_data (tuple)
+            clip_length : number of frames in a clip
+        POST:
+            clips: list of clips where each clip is a (tuple)
+                (tuple): (x_data, y_data)
+    '''
+    clips = []
+    for index in range(0, x_data.shape[0], clip_length):
+        x_clip = x_data[index:index + clip_length]
+        y_clip = y_data[index:index + clip_length]
+
+        if(x_clip.shape[0] < clip_length):
+            continue
+        if(reshape_clips):
+            x_clip = x_clip.reshape((x_clip_shape))
+            y_clip = y_clip.reshape((y_clip_shape))
+        clips.append((x_clip, y_clip))
+
+    return clips
+
+
+def generate_batches(batch):
+
+        batch_x, batch_y = batch
+        batch_x = np.array(batch_x, dtype=np.int32)
+        batch_y = np.array(batch_y, dtype=np.int32)
+        return batch_x, batch_y
+
+
+def print_metrics(scalars):
+    print_label('Loss', '{0:.2f}', scalars[0], '\t')
+    print_label('Accuracy', '{0:.2f}', scalars[1])
+
+
+def print_label(label_name, format, content, end='\n'):
+    if isinstance(content, list):
+        print(label_name + ": " + format.format(*content), end=end)
+    else:
+        print(label_name + ": " + format.format(content), end=end)
+
+
+def run_method(passed_method, clips, timesteps):
+    for i, clip in enumerate(clips):
+        print_label('\t\tClip', '{}/{}', [i + 1, timesteps], '\t')
+        scalars = passed_method(*clip)
+        print_metrics(scalars)
