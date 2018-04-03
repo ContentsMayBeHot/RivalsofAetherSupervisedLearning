@@ -1,6 +1,8 @@
 import configparser
+import datetime as dt
 import os
 import numpy as np
+import pandas as pd
 import keras
 import tensorflow as tf
 from keras.models import Sequential
@@ -79,6 +81,7 @@ def main():
     model.summary()
 
     # Train model
+    train_data = []
     for e in range(EPOCHS):
         print('Epoch: {}/{}'.format(e + 1, EPOCHS))
         for i in range(train_n):
@@ -94,12 +97,22 @@ def main():
                     batch_x, batch_y,
                     BATCH_X_SHAPE, BATCH_Y_SHAPE,
                     CLIP_LENGTH)  # noqa
-            utls.run_method(model.train_on_batch, clips, timesteps)
+            batch_scalars = utls.run_method(model.train_on_batch, clips, timesteps)
+            for clip, (loss, accuracy) in enumerate(batch_scalars):
+                train_data.append([e+1, i+1, clip+1, loss, accuracy])
             model.reset_states()
             print()
+            break
         print()
 
+    # Save training CSV
+    train_cols = [ 'Epoch', 'Replay', 'Clip', 'Loss', 'Accuracy' ]
+    train_df = pd.DataFrame(data=train_data, columns=train_cols)
+    train_csv_fpath = utls.get_csv_fpath('training')
+    train_df.to_csv(train_csv_fpath)
+
     # Test model
+    test_data = []
     for i in range(test_n):
         utls.print_label('\tTesting Batch', '{}/{}', [i + 1, test_n])
         batch = roa_loader.next_testing_batch()
@@ -112,13 +125,22 @@ def main():
                 batch_x, batch_y,
                 BATCH_X_SHAPE, BATCH_Y_SHAPE,
                 CLIP_LENGTH)  # noqa
-        utls.run_method(model.test_on_batch, clips, timesteps)
+        batch_scalars = utls.run_method(model.test_on_batch, clips, timesteps)
+        for clip, (loss, accuracy) in enumerate(batch_scalars):
+            test_data.append([i+1, clip+1, loss, accuracy])
         model.reset_states()
         print()
-    print()
+        break
+
+    # Save testing CSV
+    test_cols = [ 'Replay', 'Clip', 'Loss', 'Accuracy' ]
+    test_df = pd.DataFrame(data=test_data, columns=test_cols)
+    test_csv_fpath = utls.get_csv_fpath('testing')
+    test_df.to_csv(test_csv_fpath)
 
     # Save model
     model_path = os.path.join('..', 'models', MODEL_FNAME)
+    print('Saving model as:', os.path.realpath(model_path))
     model.save(model_path)
 
 

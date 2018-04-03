@@ -1,7 +1,9 @@
+import datetime as dt
 import enum
 import numpy as np
 import os
 
+DATA_PATH = os.path.join('..', 'data')
 
 class Actions(enum.Enum):
     LEFT = 0
@@ -179,7 +181,21 @@ def print_label(label_name, format_string, content, end='\n'):
 
 
 def run_method(method, clips, timesteps):
+    batch_scalars = []
     for i, clip in enumerate(clips):
         print_label('\t\tClip', '{}/{}', [i + 1, timesteps], '\t')
         scalars = method(*clip)
         print_metrics(scalars)
+        batch_scalars.append(scalars)
+    return batch_scalars
+
+
+def get_csv_fpath(title):
+    timestamp = dt.datetime.now().strftime('%Y%m%d')
+    i = 0
+    fpath = ''
+    while i is 0 or os.path.isfile(fpath):
+        fname = '{}_{}_{}.csv'.format(title, timestamp, i)
+        fpath = os.path.join(DATA_PATH, fname)
+        i += 1
+    return fpath
