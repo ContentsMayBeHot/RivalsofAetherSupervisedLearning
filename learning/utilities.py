@@ -58,8 +58,8 @@ def downscale_img(img):
 def pad_clip(x_clip, x_clip_shape, y_clip, y_clip_shape):
     padded_x = np.zeros(x_clip_shape, dtype=np.int32)
     padded_y = np.zeros(y_clip_shape, dtype=np.int32)
-    padded_x[:x_clip[0],:x_clip[1],:x_clip[2],:x_clip[3]] = x_clip
-    padded_y[:y_clip[0],:y_clip[1]] = y_clip
+    padded_x[:x_clip[0], :x_clip[1], :x_clip[2], :x_clip[3]] = x_clip
+    padded_y[:y_clip[0], :y_clip[1]] = y_clip
     return padded_x, padded_y
 
 
@@ -143,21 +143,38 @@ def generate_clips(x_data, y_data, x_clip_shape, y_clip_shape, clip_length, resh
     '''
     clips = []
     for index in range(0, x_data.shape[0], clip_length):
-        x_clip = batch_x[index:index + clip_length]
-        y_clip = batch_y[index:index + clip_length]
+        x_clip = x_data[index:index + clip_length]
+        y_clip = y_data[index:index + clip_length]
 
-        if(x_clip.shape[0] < CLIP_LENGTH):
-            clips.append((x_clip, y_clip))
+        if(x_clip.shape[0] < clip_length):
             continue
-
-    if(reshape_clips):
-        for clip in clips:
-            clip[0] = clip[0].reshape(x_clip_shape)
-            clip[1] = clip[1].reshape(y_clip_shape)
+        if(reshape_clips):
+            x_clip = x_clip.reshape((x_clip_shape))
+            y_clip = y_clip.reshape((y_clip_shape))
+        clips.append((x_clip, y_clip))
 
     return clips
 
 
-def print_matrics(scalars):
+def generate_batches(batch):
+        batch_x, batch_y = batch
+        batch_x = np.array(batch_x, dtype=np.int32)
+        batch_y = np.array(batch_y, dtype=np.int32)
+        return batch_x, batch_y
+
+
+def print_metrics(scalars):
     print('Loss: {0:.2f}'.format(scalars[0]), end='\t')
-    print('Accuracy: {0:.2f}'.format(scalar[1]))
+    print('Accuracy: {0:.2f}'.format(scalars[1]))
+
+
+def print_label(label_name, format, content, end='\n'):
+    print(label_name + ": " + format.format(*content), end=end)
+
+
+def run_method(passed_method, clips, timesteps):
+    for i, clip in enumerate(clips):
+        print_label('\t\tClip', '{}/{}', [i + 1, timesteps], '\t')
+        # print('\t\tClip: {}/{}'.format(i + 1, timesteps), end='\t')  # noqa
+        scalars = passed_method(*clip)
+        print_metrics(scalars)

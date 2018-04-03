@@ -4,7 +4,7 @@ import numpy as np
 import keras
 import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import Dense, Reshape, GlobalAveragePooling2D, AveragePooling3D
+from keras.layers import Dense, Reshape, GlobalAveragePooling2D, AveragePooling3D  # noqa
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
 
@@ -28,6 +28,7 @@ FILTERS = 10
 POOL_SIZE = (1, 135, 240)
 KERNEL_SIZE = (3, 3)
 
+
 def main():
     # Read ini file
     config = configparser.ConfigParser()
@@ -46,7 +47,8 @@ def main():
             data_format='channels_last',
             padding='same',
             return_sequences=True,
-            stateful=True))
+            stateful=True
+    ))  # noqa
     model.add(BatchNormalization())
     model.add(ConvLSTM2D(
             filters=FILTERS,
@@ -55,7 +57,7 @@ def main():
             padding='same',
             return_sequences=True,
             stateful=True
-    ))
+    ))  # noqa
     model.add(BatchNormalization())
     model.add(AveragePooling3D(POOL_SIZE))
     model.add(Reshape((-1, FILTERS)))
@@ -64,7 +66,7 @@ def main():
             loss='categorical_crossentropy',
             optimizer='adadelta',
             metrics=['accuracy']
-    )
+    )  # noqa
     model.summary()
 
     # Instantiate batch loader
@@ -74,23 +76,18 @@ def main():
     training_set_path = config['SETS']['PathToTraining']
     n = roa_loader.load_training_set(training_set_path)
     for e in range(EPOCHS):
-        print('Epoch: {}/{}'.format(e+1, EPOCHS))
+        print('Epoch: {}/{}'.format(e + 1, EPOCHS))
         for i in range(n):
-            print('\tTraining batch: {}/{}'.format(i+1, n))
+            utls.print_label('\tTraining Batch', '{}/{}', [i + 1, n])
             # Get a single replay
             batch = roa_loader.next_training_batch()
             if not batch:
                 break
-            batch_x, batch_y = batch
-            batch_x = np.array(batch_x, dtype=np.int32)
-            batch_y = np.array(batch_y, dtype=np.int32)
+            batch_x, batch_y = utls.generate_batches(batch)
+            timesteps = batch_x.shape[0] // 100
             # Get clips of the replay
-            clips = generate_clips(batch_x, batch_y, BATCH_X_SHAPE, BATCH_Y_SHAPE)  # noqa
-            for i, clip in enumerate(clips):
-                timesteps = batch_x.shape[0] // 100
-                print('\t\tClip: {}/{}'.format((i//100)+1, timesteps), end='\t')  # noqa
-                scalars = model.train_on_batch(clip[0], clip[1])
-                print_metrics(scalars)
+            clips = utls.generate_clips(batch_x, batch_y, BATCH_X_SHAPE, BATCH_Y_SHAPE, CLIP_LENGTH)  # noqa
+            utls.run_method(model.train_on_batch, clips, timesteps)
             model.reset_states()
             print()
         print()
@@ -99,19 +96,15 @@ def main():
     testing_set_path = config['SETS']['PathToTesting']
     n = roa_loader.load_testing_set(testing_set_path)
     for i in range(n):
-        print('Testing batch: {}/{}'.format(i+1, n))
+        utls.print_label('\tTesting Batch', '{}/{}', [i + 1, n])
         batch = roa_loader.next_testing_batch()
         if not batch:
             break
-        batch_x, batch_y = batch
-        batch_x = np.array(batch_x, dtype=np.int32)
-        batch_y = np.array(batch_y, dtype=np.int32)
-        clips = generate_clips(batch_x, batch_y, BATCH_X_SHAPE, BATCH_Y_SHAPE)  # noqa
-        for i, clip in enumerate(clips):
-            timesteps = batch_x.shape[0] // 100
-            print('\t\tClip: {}/{}'.format((i//100)+1, timesteps), end='\t')  # noqa
-            scalars = model.test_on_batch(clip[0], clip[1])
-            print_metrics(scalars)
+        batch_x, batch_y = utls.generate_batches(batch)
+        timesteps = batch_x.shape[0] // 100
+
+        clips = utls.generate_clips(batch_x, batch_y, BATCH_X_SHAPE, BATCH_Y_SHAPE, CLIP)  # noqa
+        utls.run_method(model.test_on_batch, clips, timesteps)
         model.reset_states()
         print()
     print()
@@ -119,6 +112,7 @@ def main():
     # Save model
     model_path = os.path.join('..', 'models', MODEL_FNAME)
     model.save(model_path)
+
 
 if __name__ == '__main__':
     main()
