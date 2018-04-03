@@ -5,6 +5,7 @@ import os
 
 DATA_PATH = os.path.join('..', 'data')
 
+
 class Actions(enum.Enum):
     LEFT = 0
     LEFT_TAP = 1

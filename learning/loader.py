@@ -5,7 +5,8 @@ import numpy as np
 import shutil
 
 from sync import SyncedReplay
-import utilities as utls    
+import utilities as utls
+
 
 def enqueue_samples(queue, x_set, y_set):
     while len(x_set) > 0:
@@ -17,6 +18,7 @@ def enqueue_samples(queue, x_set, y_set):
         queue.put(sample, block=True)
     queue.put(None, block=True)
     queue.close()
+
 
 def unpack_sample(xdir_apath, ydir_apath):
     '''Get the synced x and y data for a collection of frames and labels'''
@@ -34,6 +36,7 @@ def unpack_sample(xdir_apath, ydir_apath):
         x.append(frame)  # shape: (135, 240, 3)
         y.append(label)  # shape: (26,)
     return x, y
+
 
 class ROALoader:
     def __init__(self):
@@ -67,7 +70,7 @@ class ROALoader:
         self.train_queue = mp.Queue(maxsize=max_queue_size)
         self.train_subprocess = mp.Process(
                 target=enqueue_samples,
-                args=(self.train_queue, self.x_train, self.y_train))
+                args=(self.train_queue, self.x_train, self.y_train))  # noqa
         self.train_subprocess.start()
         return len(self.x_train)
 
@@ -77,7 +80,7 @@ class ROALoader:
         self.test_queue = mp.Queue(maxsize=max_queue_size)
         self.test_subprocess = mp.Process(
                 target=enqueue_samples,
-                args=(self.test_queue, self.x_test, self.y_test))
+                args=(self.test_queue, self.x_test, self.y_test))  # noqa
         self.test_subprocess.start()
         return len(self.x_test)
 
@@ -98,6 +101,6 @@ class ROALoader:
 
     def get_training_count(self):
         return self.__get_count__(self.x_train)
-    
+
     def get_testing_count(self):
         return self.__get_count__(self.x_test)

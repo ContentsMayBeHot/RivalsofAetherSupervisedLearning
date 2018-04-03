@@ -98,16 +98,16 @@ def main():
                     batch_x, batch_y,
                     BATCH_X_SHAPE, BATCH_Y_SHAPE,
                     CLIP_LENGTH)  # noqa
-            batch_scalars = utls.run_method(model.train_on_batch, clips, timesteps)
+            batch_scalars = utls.run_method(model.train_on_batch, clips, timesteps)  # noqa
             for clip, (loss, accuracy) in enumerate(batch_scalars):
-                train_data.append([e+1, i+1, clip+1, loss, accuracy])
+                train_data.append([e + 1, i + 1, clip + 1, loss, accuracy])
             model.reset_states()
             print()
             break
         print()
 
     # Save training CSV
-    train_cols = [ 'Epoch', 'Replay', 'Clip', 'Loss', 'Accuracy' ]
+    train_cols = ['Epoch', 'Replay', 'Clip', 'Loss', 'Accuracy']
     train_df = pd.DataFrame(data=train_data, columns=train_cols)
     train_csv_fpath = utls.get_csv_fpath('training')
     train_df.to_csv(train_csv_fpath)
@@ -130,13 +130,13 @@ def main():
                 CLIP_LENGTH)  # noqa
         batch_scalars = utls.run_method(model.test_on_batch, clips, timesteps)
         for clip, (loss, accuracy) in enumerate(batch_scalars):
-            test_data.append([i+1, clip+1, loss, accuracy])
+            test_data.append([i + 1, clip + 1, loss, accuracy])
         model.reset_states()
         print()
         break
 
     # Save testing CSV
-    test_cols = [ 'Replay', 'Clip', 'Loss', 'Accuracy' ]
+    test_cols = ['Replay', 'Clip', 'Loss', 'Accuracy']
     test_df = pd.DataFrame(data=test_data, columns=test_cols)
     test_csv_fpath = utls.get_csv_fpath('testing')
     test_df.to_csv(test_csv_fpath)

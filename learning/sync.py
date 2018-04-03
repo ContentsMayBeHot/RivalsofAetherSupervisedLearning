@@ -4,6 +4,7 @@ import numpy as np
 from operator import itemgetter
 import skimage.io
 
+
 class SyncedFrame:
     def __init__(self, frame, action_matrix):
         self.frame = frame
@@ -63,6 +64,7 @@ class SyncedReplay:
     def normalize(self):
         for synced in self.synced_frames:
             synced.normalize()
+
 
 if __name__ == "__main__":
 
