@@ -176,7 +176,7 @@ def print_label(label_name, format, content, end='\n'):
     if isinstance(content, list):
         print(label_name + ": " + format.format(*content), end=end)
     else:
-        print(label_name + ": " + format.format(*content), end=end)
+        print(label_name + ": " + format.format(content), end=end)
 
 
 def run_method(passed_method, clips, timesteps):
