@@ -140,7 +140,7 @@ def main():
     test_df = pd.DataFrame(data=test_data, columns=test_cols)
     test_csv_fpath = utls.get_csv_fpath('testing')
     test_df.to_csv(test_csv_fpath)
-    print('Saving testing metrics to:', os.path.realpath(test_csv_fpath)')
+    print('Saving testing metrics to:', os.path.realpath(test_csv_fpath))
 
     # Save model
     model_path = os.path.join('..', 'models', MODEL_FNAME)
