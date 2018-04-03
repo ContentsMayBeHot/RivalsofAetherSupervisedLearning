@@ -173,7 +173,7 @@ def print_metrics(scalars):
 
 
 def print_label(label_name, format, content, end='\n'):
-    if type(content) == list:
+    if isinstance(content, list):
         print(label_name + ": " + format.format(*content), end=end)
     else:
         print(label_name + ": " + format.format(*content), end=end)
