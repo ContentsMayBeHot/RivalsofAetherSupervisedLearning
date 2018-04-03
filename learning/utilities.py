@@ -134,4 +134,11 @@ def listdir_np_only(apath):
 def generate_clips(x_data, y_data, x_shape, y_shape, clip_length):
     clips = []
     for index in range(0, x_shape[0], clip_length):
-        clip = []
+        x_clip = batch_x[index:index + clip_length]
+        y_clip = batch_y[index:index + clip_length]
+
+        if(x_clip.shape[0] < CLIP_LENGTH):
+            clips.append((x_clip, y_clip))
+            continue
+
+    return clips
