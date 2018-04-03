@@ -173,7 +173,10 @@ def print_metrics(scalars):
 
 
 def print_label(label_name, format, content, end='\n'):
-    print(label_name + ": " + format.format(*content), end=end)
+    if type(content) == list:
+        print(label_name + ": " + format.format(*content), end=end)
+    else:
+        print(label_name + ": " + format.format(*content), end=end)
 
 
 def run_method(passed_method, clips, timesteps):
