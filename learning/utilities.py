@@ -169,7 +169,7 @@ def generate_batches(batch):
 
 def print_metrics(scalars):
     print_label('Loss', '{0:.2f}', scalars[0], '\t')
-    print_label('Accuracy', '{0:.2f}', scalars[1], '\t')
+    print_label('Accuracy', '{0:.2f}', scalars[1])
 
 
 def print_label(label_name, format, content, end='\n'):
