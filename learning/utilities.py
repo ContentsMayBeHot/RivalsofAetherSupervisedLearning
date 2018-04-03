@@ -55,10 +55,6 @@ def downscale_img(img):
     return None
 
 
-def get_clips(batch_x, clip_x_shape, batch_y, clip_y_shape, clip_length):
-    return None
-
-
 def pad_clip(x_clip, x_clip_shape, y_clip, y_clip_shape):
     padded_x = np.zeros(x_clip_shape, dtype=np.int32)
     padded_y = np.zeros(y_clip_shape, dtype=np.int32)
@@ -133,3 +129,9 @@ def listdir_np_only(apath):
         if os.path.isfile(os.path.join(apath, dirent))
         and (dirent.endswith('np') or dirent.endswith('npy'))
     ]
+
+
+def generate_clips(x_data, y_data, x_shape, y_shape, clip_length):
+    clips = []
+    for index in range(0, x_shape[0], clip_length):
+        clip = []
