@@ -103,7 +103,6 @@ def main():
                 train_data.append([e + 1, i + 1, clip + 1, loss, accuracy])
             model.reset_states()
             print()
-            break
         print()
 
     # Save training CSV
@@ -133,7 +132,6 @@ def main():
             test_data.append([i + 1, clip + 1, loss, accuracy])
         model.reset_states()
         print()
-        break
 
     # Save testing CSV
     test_cols = ['Replay', 'Clip', 'Loss', 'Accuracy']
