@@ -1,5 +1,5 @@
 from test_common import learning
-from learning import ROALoader
+# from learning import ROALoader
 
 import pytest
 
