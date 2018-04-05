@@ -78,6 +78,8 @@ Move all of your _roa_ files to the game's replays folder. Next, run **python /p
 
 <h3>Collecting frames</h3>
 
+**WARNING**: Never run the collector agent without backing up your replays first. Any replays that happen to be in the replays folder (and not one of it's subfolders) will be deleted. Thus, it is essential that you run the the replay manager's sort function (as detailed above) prior to collecting.
+
 Launch Anaconda Prompt, activate the project environment, navigate to _/.../SerpentAI/_, and run the following commands: 1) **serpent activate SerpentRivalsofAetherGamePlugin**, and 2) **serpent activate SerpentRivalsofAetherGameAgentPlugin**. You can also run **serpent plugins** to check available and activated plugins.
 
 To collect frames effectively, we will need to override the game frame limiter setting for our game agent. Open _/.../SerpentAI/config/config.plugins.yml_ in a text editor and update the FPS value for _SerpentRivalsofAetherGameAgentPlugin_. We found that 10 FPS offers a decent balance.
