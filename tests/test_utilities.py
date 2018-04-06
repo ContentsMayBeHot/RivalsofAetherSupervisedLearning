@@ -59,6 +59,7 @@ def test_generate_clips(next_batch_4800):
                                 BATCH_X_SHAPE, BATCH_Y_SHAPE,
                                 CLIP_LENGTH)
     assert len(clips) == 48
+    assert len(clip[0]) == 100
 
 
 def test_pad_clip(next_clip_95):
