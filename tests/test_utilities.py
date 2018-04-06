@@ -14,6 +14,7 @@ CLIP_Y_SHAPE = (CLIP_LENGTH, CLASSES)
 BATCH_X_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
 BATCH_Y_SHAPE = (1, CLIP_LENGTH, CLASSES)
 
+
 @pytest.fixture
 def next_batch_4800():
     x = np.ones((4800, 135, 240, 1), dtype=int)
