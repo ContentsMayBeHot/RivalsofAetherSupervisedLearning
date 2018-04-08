@@ -22,7 +22,7 @@ def loader_with_training_set():
 
 def test_load_set(loader_with_training_set):
     n, _ = loader_with_training_set
-    assert n == 12
+    assert n is 12
 
 def test_next_batch(loader_with_training_set):
     _, roa = loader_with_training_set

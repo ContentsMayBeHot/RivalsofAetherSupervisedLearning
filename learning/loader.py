@@ -8,6 +8,7 @@ import sys
 import sync
 import utilities as utls
 
+
 def enqueue_samples(queue, x_set, y_set):
     while len(x_set) > 0:
         xdir_apath = x_set.pop()
@@ -46,7 +47,9 @@ class ROALoader:
         self.x_test = []
         self.y_test = []
         self.train_queue = None
+        self.train_subprocess = None
         self.test_queue = None
+        self.test_subprocess = None
 
     def __load_set__(self, set_path):
         '''Load paths to all frame and label data for a given set'''
