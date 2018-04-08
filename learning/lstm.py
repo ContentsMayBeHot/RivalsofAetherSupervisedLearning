@@ -13,6 +13,7 @@ from keras.layers.normalization import BatchNormalization
 from loader import ROALoader
 import utilities as utls
 
+
 EPOCHS = 1
 MODEL_FNAME = 'rival.h5'
 
@@ -20,7 +21,7 @@ CLASSES = 9
 IMG_U = 135
 IMG_V = 240
 IMG_C = 1
-CLIP_LENGTH = 100
+CLIP_LENGTH = 1
 CLIP_X_SHAPE = (CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
 CLIP_Y_SHAPE = (CLIP_LENGTH, CLASSES)
 BATCH_X_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
@@ -29,6 +30,9 @@ BATCH_Y_SHAPE = (1, CLIP_LENGTH, CLASSES)
 FILTERS = 10
 POOL_SIZE = (1, 135, 240)
 KERNEL_SIZE = (3, 3)
+
+TRAIN_LIMIT = None
+TEST_LIMIT = None
 
 
 def main():
@@ -86,19 +90,23 @@ def main():
     for e in range(EPOCHS):
         print('Epoch: {}/{}'.format(e + 1, EPOCHS))
         for i in range(train_n):
+            if TRAIN_LIMIT and i >= TRAIN_LIMIT:
+                print('Terminating early because training limit exceeded')
+                roa_loader.kill_training_subprocess()
+                break
             utls.print_label('\tTraining Batch', '{}/{}', [i + 1, train_n])
             # Get a single replay
             batch = roa_loader.next_training_batch()
             if not batch:
                 break
             batch_x, batch_y = utls.generate_batches(batch)
-            timesteps = batch_x.shape[0] // 100
+            tsteps = batch_x.shape[0] // CLIP_LENGTH
             # Get clips of the replay
             clips = utls.generate_clips(
                     batch_x, batch_y,
                     BATCH_X_SHAPE, BATCH_Y_SHAPE,
-                    CLIP_LENGTH)  # noqa
-            batch_scalars = utls.run_method(model.train_on_batch, clips, timesteps)  # noqa
+                    CLIP_LENGTH)
+            batch_scalars = utls.run_method(model.train_on_batch, clips, tsteps)
             for clip, (loss, accuracy) in enumerate(batch_scalars):
                 train_data.append([e + 1, i + 1, clip + 1, loss, accuracy])
             model.reset_states()
@@ -116,12 +124,16 @@ def main():
     # Test model
     test_data = []
     for i in range(test_n):
+        if TRAIN_LIMIT and i >= TEST_LIMIT:
+            print('Terminating early because testing limit exceeded')
+            roa_loader.kill_testing_subprocess()
+            break
         utls.print_label('\tTesting Batch', '{}/{}', [i + 1, test_n])
         batch = roa_loader.next_testing_batch()
         if not batch:
             break
         batch_x, batch_y = utls.generate_batches(batch)
-        timesteps = batch_x.shape[0] // 100
+        timesteps = batch_x.shape[0] // CLIP_LENGTH
 
         clips = utls.generate_clips(
                 batch_x, batch_y,

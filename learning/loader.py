@@ -96,6 +96,17 @@ class ROALoader:
         '''Load a batch of synced x and y data from the testing set'''
         return self.test_queue.get(block=True)
 
+    def __kill_subprocess__(self, sub):
+        if sub is not None and isinstance(sub, mp.Process) and sub.is_alive():
+            sub.terminate()
+            sub = None
+
+    def kill_training_subprocess(self):
+        self.__kill_subprocess__(self.train_subprocess)
+
+    def kill_testing_subprocess(self):
+        self.__kill_subprocess__(self.test_subprocess)
+
     def __get_set_count__(self, x_set):
         xsize = 0
         for xdir_apath in x_set:
