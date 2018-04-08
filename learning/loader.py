@@ -5,7 +5,6 @@ import numpy as np
 import shutil
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 import sync
 import utilities as utls
 
