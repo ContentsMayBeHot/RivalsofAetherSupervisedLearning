@@ -4,10 +4,6 @@ import pytest
 from test_common import learning
 from learning import loader
 
-SAMPLES_PATH = os.path.join('..', 'samples')
-SAMPLE_SET_PATH = os.path.join(SAMPLES_PATH, 'sample_set')
-SAMPLE_SET_SIZE = 10
-
 def test_init():
     roa = loader.ROALoader()
     assert roa.x_train == []
@@ -21,6 +17,11 @@ def test_load_set():
     roa = loader.ROALoader()
     n = roa.load_training_set(SAMPLE_SET_PATH, max_queue_size=1)
     assert n == SAMPLE_SET_SIZE
+
+    xset = roa.x_train
+    yset = roa.y_train
+
+
 
 def test_next_batch():
     roa = loader.ROALoader()
