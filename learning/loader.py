@@ -10,6 +10,7 @@ import utilities as utls
 
 
 def enqueue_samples(queue, x_set, y_set):
+    '''Subprocess task for loading and unpacking samples in the background'''
     while len(x_set) > 0:
         xdir_apath = x_set.pop()
         ydir_apath = y_set.pop()
@@ -34,8 +35,8 @@ def unpack_sample(xdir_apath, ydir_apath):
     for pair in xysync.synced_frames:
         frame = utls.rgb2gray(pair.frame)
         label = utls.reduce_classes(pair.actions)
-        x.append(frame)  # shape: (135, 240, 3)
-        y.append(label)  # shape: (26,)
+        x.append(frame)  # shape: (135, 240, 1)
+        y.append(label)  # shape: (9,)
     return x, y
 
 
@@ -95,7 +96,7 @@ class ROALoader:
         '''Load a batch of synced x and y data from the testing set'''
         return self.test_queue.get(block=True)
 
-    def __get_count__(self, x_set):
+    def __get_set_count__(self, x_set):
         xsize = 0
         for xdir_apath in x_set:
             if os.path.isdir(xdir_apath):
@@ -103,7 +104,7 @@ class ROALoader:
         return xsize
 
     def get_training_count(self):
-        return self.__get_count__(self.x_train)
+        return self.__get_set_count__(self.x_train)
 
     def get_testing_count(self):
-        return self.__get_count__(self.x_test)
+        return self.__get_set_count__(self.x_test)

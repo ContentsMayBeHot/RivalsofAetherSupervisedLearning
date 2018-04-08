@@ -21,13 +21,13 @@ class TestImports:
         assert 'learning' in sys.modules
 
     def test_sync(self):
-        from learning import sync
+        from learning import sync as _
 
     def test_loader(self):
-        from learning import loader
+        from learning import loader as _
 
     def test_utilities(self):
-        from learning import utilities
+        from learning import utilities as _
 
 class TestSamples:
     def test_replays_exist(self):
@@ -37,6 +37,16 @@ class TestSamples:
             if dirent.endswith('.roa')
         ]
         assert len(replays) == 12
+
+    def test_frames_dir(self):
+        assert os.path.isdir(SAMPLE_SET_X_PATH)
+        xset = os.listdir(SAMPLE_SET_X_PATH)
+        assert len(xset) == 12
+
+    def test_labels_dir(self):
+        assert os.path.isdir(SAMPLE_SET_Y_PATH)
+        yset = os.listdir(SAMPLE_SET_Y_PATH)
+        assert len(yset) == 12
 
     def test_frames(self):
         for xdir in os.listdir(SAMPLE_SET_X_PATH):
@@ -63,13 +73,3 @@ class TestSamples:
             for y in ydata:
                 ypath = os.path.join(ydir_path, y)
                 np.load(ypath)
-
-    def test_frames_dir(self):
-        assert os.path.isdir(SAMPLE_SET_X_PATH)
-        xset = os.listdir(SAMPLE_SET_X_PATH)
-        assert len(xset) == 12
-
-    def test_labels_dir(self):
-        assert os.path.isdir(SAMPLE_SET_Y_PATH)
-        yset = os.listdir(SAMPLE_SET_Y_PATH)
-        assert len(yset) == 12
