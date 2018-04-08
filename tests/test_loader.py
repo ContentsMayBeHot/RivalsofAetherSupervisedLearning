@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from test_common import learning
+from test_common import learning, SAMPLE_SET_PATH
 from learning import loader
 
 def test_init():
@@ -13,17 +13,18 @@ def test_init():
     assert roa.train_queue == None
     assert roa.test_queue == None
 
-def test_load_set():
+@pytest.fixture
+def loader_with_training_set():
     roa = loader.ROALoader()
-    n = roa.load_training_set(SAMPLE_SET_PATH, max_queue_size=1)
-    assert n == SAMPLE_SET_SIZE
+    n = roa.load_training_set(SAMPLE_SET_PATH, max_queue_size=12)
+    yield n, roa
+    roa.train_subprocess.terminate()
 
-    xset = roa.x_train
-    yset = roa.y_train
+def test_load_set(loader_with_training_set):
+    n, _ = loader_with_training_set
+    assert n == 12
 
-
-
-def test_next_batch():
-    roa = loader.ROALoader()
-    roa.load_training_set(SAMPLE_SET_PATH, max_queue_size=1)
+def test_next_batch(loader_with_training_set):
+    _, roa = loader_with_training_set
     batch = roa.next_training_batch()
+    assert batch is not None
