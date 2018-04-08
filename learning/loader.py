@@ -3,10 +3,11 @@ import os
 import multiprocessing as mp
 import numpy as np
 import shutil
+import sys
 
-from sync import SyncedReplay
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+import sync
 import utilities as utls
-
 
 def enqueue_samples(queue, x_set, y_set):
     while len(x_set) > 0:
@@ -25,12 +26,12 @@ def unpack_sample(xdir_apath, ydir_apath):
     ydir = utls.listdir_np_only(ydir_apath)
     y_fname = ydir[0]
     y_apath = os.path.join(ydir_apath, y_fname)
-    synced = SyncedReplay()
-    synced.create_sync_from_npys(xdir_apath, y_apath)
+    xysync = sync.SyncedReplay()
+    xysync.create_sync_from_npys(xdir_apath, y_apath)
     x = []
     y = []
     # For each synced frame in the replay
-    for pair in synced.synced_frames:
+    for pair in xysync.synced_frames:
         frame = utls.rgb2gray(pair.frame)
         label = utls.reduce_classes(pair.actions)
         x.append(frame)  # shape: (135, 240, 3)

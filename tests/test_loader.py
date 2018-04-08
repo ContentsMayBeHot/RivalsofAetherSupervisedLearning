@@ -22,6 +22,7 @@ def test_load_set():
     n = roa.load_training_set(SAMPLE_SET_PATH, max_queue_size=1)
     assert n == SAMPLE_SET_SIZE
 
-def test_next_batch)(:
+def test_next_batch():
     roa = loader.ROALoader()
     roa.load_training_set(SAMPLE_SET_PATH, max_queue_size=1)
+    batch = roa.next_training_batch()
