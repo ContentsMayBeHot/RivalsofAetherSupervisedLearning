@@ -16,12 +16,13 @@ import utilities as utls
 
 EPOCHS = 1
 MODEL_FNAME = 'rival.h5'
+WEIGHTS_FNAME = 'rival-w.h5'
 
 CLASSES = 9
 IMG_U = 135
 IMG_V = 240
 IMG_C = 1
-CLIP_LENGTH = 1
+CLIP_LENGTH = 100
 CLIP_X_SHAPE = (CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
 CLIP_Y_SHAPE = (CLIP_LENGTH, CLASSES)
 BATCH_X_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
@@ -156,6 +157,11 @@ def main():
     model_path = os.path.join('..', 'models', MODEL_FNAME)
     print('Saving model as:', os.path.realpath(model_path))
     model.save(model_path)
+
+    # Save weights
+    weights_path = os.path.join('..', 'models', WEIGHTS_FNAME)
+    print('Saving weights as:', os.path.realpath(weights_path))
+    model.save_weights(weights_path)
 
 
 if __name__ == '__main__':
