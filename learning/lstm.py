@@ -14,7 +14,7 @@ from loader import ROALoader
 import utilities as utls
 
 
-EPOCHS = 1
+EPOCHS = 2
 MODEL_FNAME = 'rival.h5'
 WEIGHTS_FNAME = 'rival-w.h5'
 
@@ -108,14 +108,15 @@ def main():
                     BATCH_X_SHAPE, BATCH_Y_SHAPE,
                     CLIP_LENGTH)
             batch_scalars = utls.run_method(model.train_on_batch, clips, tsteps)
+            ts = dt.datetime.now()
             for clip, (loss, accuracy) in enumerate(batch_scalars):
-                train_data.append([e + 1, i + 1, clip + 1, loss, accuracy])
+                train_data.append([e + 1, i + 1, clip + 1, loss, accuracy, ts])
             model.reset_states()
             print()
         print()
 
     # Save training CSV
-    train_cols = ['Epoch', 'Replay', 'Clip', 'Loss', 'Accuracy']
+    train_cols = ['Epoch', 'Replay', 'Clip', 'Loss', 'Accuracy', 'Timestamp']
     train_df = pd.DataFrame(data=train_data, columns=train_cols)
     train_csv_fpath = utls.get_csv_fpath('training')
     train_df.to_csv(train_csv_fpath)
@@ -141,13 +142,14 @@ def main():
                 BATCH_X_SHAPE, BATCH_Y_SHAPE,
                 CLIP_LENGTH)  # noqa
         batch_scalars = utls.run_method(model.test_on_batch, clips, timesteps)
+        ts = dt.datetime.now()
         for clip, (loss, accuracy) in enumerate(batch_scalars):
-            test_data.append([i + 1, clip + 1, loss, accuracy])
+            test_data.append([i + 1, clip + 1, loss, accuracy, ts])
         model.reset_states()
         print()
 
     # Save testing CSV
-    test_cols = ['Replay', 'Clip', 'Loss', 'Accuracy']
+    test_cols = ['Replay', 'Clip', 'Loss', 'Accuracy', 'Timestamp']
     test_df = pd.DataFrame(data=test_data, columns=test_cols)
     test_csv_fpath = utls.get_csv_fpath('testing')
     test_df.to_csv(test_csv_fpath)
