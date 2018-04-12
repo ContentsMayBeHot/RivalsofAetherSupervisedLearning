@@ -14,7 +14,7 @@ from loader import ROALoader
 import utilities as utls
 
 
-EPOCHS = 2
+EPOCHS = 1
 MODEL_FNAME = 'rival.h5'
 WEIGHTS_FNAME = 'rival-w.h5'
 
@@ -32,8 +32,8 @@ FILTERS = 10
 POOL_SIZE = (1, 135, 240)
 KERNEL_SIZE = (3, 3)
 
-TRAIN_LIMIT = None
-TEST_LIMIT = None
+TRAIN_LIMIT = 2
+TEST_LIMIT = 2
 
 
 def main():
@@ -147,6 +147,7 @@ def main():
             test_data.append([i + 1, clip + 1, loss, accuracy, ts])
         model.reset_states()
         print()
+    print()
 
     # Save testing CSV
     test_cols = ['Replay', 'Clip', 'Loss', 'Accuracy', 'Timestamp']
