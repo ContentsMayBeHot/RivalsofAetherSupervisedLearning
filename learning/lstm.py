@@ -88,7 +88,7 @@ def main():
     # Train model
     train_data = []
     for e in range(EPOCHS):
-        print('Loading Training set for EPOCH ' + str(e))
+        print('Loading Training set for EPOCH ' + str(e + 1))
         train_n = roa_loader.load_training_set(training_set_path)
         print('Epoch: {}/{}'.format(e + 1, EPOCHS))
         for i in range(train_n):
@@ -110,7 +110,7 @@ def main():
                 train_data.append([e + 1, i + 1, clip + 1, loss, accuracy, ts])
             model.reset_states()
             print()
-        print("Terminating subprocess for EPOCH " + str(e))
+        print("Terminating subprocess for EPOCH " + str(e + 1))
         roa_loader.kill_training_subprocess()
         print()
 
