@@ -14,7 +14,7 @@ from loader import ROALoader
 import utilities as utls
 
 
-EPOCHS = 1
+EPOCHS = 4
 MODEL_FNAME = 'rival.h5'
 WEIGHTS_FNAME = 'rival-w.h5'
 
@@ -49,7 +49,6 @@ def main():
     roa_loader = ROALoader()
     # Load training set
     training_set_path = config['SETS']['PathToTraining']
-    train_n = roa_loader.load_training_set(training_set_path)
     # Load testing set
     testing_set_path = config['SETS']['PathToTesting']
     test_n = roa_loader.load_testing_set(testing_set_path)
@@ -89,12 +88,10 @@ def main():
     # Train model
     train_data = []
     for e in range(EPOCHS):
+        print('Loading Training set for EPOCH ' + str(e))
+        train_n = roa_loader.load_training_set(training_set_path)
         print('Epoch: {}/{}'.format(e + 1, EPOCHS))
         for i in range(train_n):
-            if TRAIN_LIMIT and i >= TRAIN_LIMIT:
-                print('Terminating early because training limit exceeded')
-                roa_loader.kill_training_subprocess()
-                break
             utls.print_label('\tTraining Batch', '{}/{}', [i + 1, train_n])
             # Get a single replay
             batch = roa_loader.next_training_batch()
@@ -113,6 +110,8 @@ def main():
                 train_data.append([e + 1, i + 1, clip + 1, loss, accuracy, ts])
             model.reset_states()
             print()
+        print("Terminating subprocess for EPOCH " + str(e))
+        roa_loader.kill_training_subprocess()
         print()
 
     # Save training CSV
@@ -126,10 +125,6 @@ def main():
     # Test model
     test_data = []
     for i in range(test_n):
-        if TRAIN_LIMIT and i >= TEST_LIMIT:
-            print('Terminating early because testing limit exceeded')
-            roa_loader.kill_testing_subprocess()
-            break
         utls.print_label('\tTesting Batch', '{}/{}', [i + 1, test_n])
         batch = roa_loader.next_testing_batch()
         if not batch:
