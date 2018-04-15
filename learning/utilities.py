@@ -171,6 +171,7 @@ def generate_batches(batch):
     batch_x, batch_y = batch
     batch_y1 = list(batch_y)  # Copy y
     batch_y1.insert(0, np.zeros(9,))  # Prepend with zeros
+    batch_y1.pop(-1)  # Chomp the last element
 
     # Convert to NumPy arrays
     batch_x = np.array(batch_x, dtype=np.int32)
