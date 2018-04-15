@@ -61,6 +61,7 @@ class ROALoader:
         self.kill_training_subprocess()
         self.kill_testing_subprocess()
         print('Successfully killed worker processes')
+        sys.exit(1)
 
     def __load_set__(self, set_path):
         '''Load paths to all frame and label data for a given set'''

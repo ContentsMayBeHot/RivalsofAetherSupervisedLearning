@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 import keras
 import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Dense, Reshape, GlobalAveragePooling2D, AveragePooling3D  # noqa
+from keras.models import Sequential, Model
+from keras.layers import Dense, Reshape, GlobalAveragePooling2D, AveragePooling3D, Input, LSTM, TimeDistributed  # noqa
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
 
@@ -36,23 +36,7 @@ TRAIN_LIMIT = 2
 TEST_LIMIT = 2
 
 
-def main():
-    # Read ini file
-    config = configparser.ConfigParser()
-    config.read(os.path.join('..', 'config.ini'))
-    # Turn off CPU feature warnings
-    os.environ['TF_CPP_MIConvLSTM2D'] = '2'
-    # Display device information
-    tf.Session(config=tf.ConfigProto(log_device_placement=True))
-
-    # Instantiate batch loader
-    roa_loader = ROALoader()
-    # Load training set
-    training_set_path = config['SETS']['PathToTraining']
-    # Load testing set
-    testing_set_path = config['SETS']['PathToTesting']
-    test_n = roa_loader.load_testing_set(testing_set_path)
-
+def model_ConvLSTM2D():
     # Define ConvLSTM2D model
     model = Sequential()
     model.add(ConvLSTM2D(
@@ -82,8 +66,61 @@ def main():
             optimizer='adadelta',
             metrics=['accuracy']
     )  # noqa
+    return model
+
+
+def model_functional():
+    vision_input = Input(
+            batch_shape=BATCH_X_SHAPE,
+            name='main_input')
+    vision_x = ConvLSTM2D(
+            filters=FILTERS,
+            kernel_size=KERNEL_SIZE,
+            batch_input_shape=BATCH_X_SHAPE,
+            data_format='channels_last',
+            padding='same',
+            return_sequences=True,
+            stateful=True)(vision_input)
+    vision_x = BatchNormalization()(vision_x)
+    vision_x = AveragePooling3D(
+            pool_size=POOL_SIZE)(vision_x)
+    vision_x = Reshape(
+            target_shape=(-1, FILTERS))(vision_x)
+    vision_output = Dense(
+            units=CLASSES,
+            activation='sigmoid')(vision_x)
+
+    model = Model(inputs=[vision_input], outputs=[vision_output])
+    model.compile(
+            loss='categorical_crossentropy',
+            optimizer='adadelta',
+            metrics=['accuracy'])
+    return model
+
+
+def main():
+    # Read ini file
+    config = configparser.ConfigParser()
+    config.read(os.path.join('..', 'config.ini'))
+    # Turn off CPU feature warnings
+    os.environ['TF_CPP_MIConvLSTM2D'] = '2'
+    # Display device information
+    tf.Session(config=tf.ConfigProto(log_device_placement=True))
+
+    # Instantiate batch loader
+    roa_loader = ROALoader()
+    # Load training set
+    training_set_path = config['SETS']['PathToTraining']
+    # Load testing set
+    testing_set_path = config['SETS']['PathToTesting']
+    test_n = roa_loader.load_testing_set(testing_set_path)
+
+    # Get model
+    model = model_functional()
     model.summary()
     print()
+    # quit()
+
 
     # Train model
     train_data = []
