@@ -23,14 +23,17 @@ IMG_U = 135
 IMG_V = 240
 IMG_C = 1
 CLIP_LENGTH = 100
-CLIP_X_SHAPE = (CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
-CLIP_Y_SHAPE = (CLIP_LENGTH, CLASSES)
-BATCH_X_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
-BATCH_Y_SHAPE = (1, CLIP_LENGTH, CLASSES)
+VISION_INPUT_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
+ACTIONS_INPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
+OUTPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
 
-FILTERS = 10
+FILTERS = 20
 POOL_SIZE = (1, 135, 240)
 KERNEL_SIZE = (3, 3)
+
+LSTM_UNITS = 32
+
+DEEP_UNITS = 64
 
 TRAIN_LIMIT = 2
 TEST_LIMIT = 2
@@ -42,7 +45,7 @@ def model_ConvLSTM2D():
     model.add(ConvLSTM2D(
             filters=FILTERS,
             kernel_size=KERNEL_SIZE,
-            batch_input_shape=BATCH_X_SHAPE,
+            batch_input_shape=VISION_INPUT_SHAPE,
             data_format='channels_last',
             padding='same',
             return_sequences=True,
@@ -70,27 +73,46 @@ def model_ConvLSTM2D():
 
 
 def model_functional():
+    # Primary
     vision_input = Input(
-            batch_shape=BATCH_X_SHAPE,
-            name='main_input')
+            batch_shape=VISION_INPUT_SHAPE,
+            name='vision_input')
     vision_x = ConvLSTM2D(
             filters=FILTERS,
             kernel_size=KERNEL_SIZE,
-            batch_input_shape=BATCH_X_SHAPE,
+            batch_input_shape=VISION_INPUT_SHAPE,
             data_format='channels_last',
             padding='same',
             return_sequences=True,
             stateful=True)(vision_input)
     vision_x = BatchNormalization()(vision_x)
-    vision_x = AveragePooling3D(
-            pool_size=POOL_SIZE)(vision_x)
-    vision_x = Reshape(
-            target_shape=(-1, FILTERS))(vision_x)
-    vision_output = Dense(
-            units=CLASSES,
-            activation='sigmoid')(vision_x)
+    vision_x = AveragePooling3D(pool_size=POOL_SIZE)(vision_x)
+    vision_out = Reshape(target_shape=(-1, FILTERS))(vision_x)
 
-    model = Model(inputs=[vision_input], outputs=[vision_output])
+    # Auxiliary
+    actions_input = Input(
+        batch_shape=ACTIONS_INPUT_SHAPE,
+        name='actions_input'
+    )
+    actions_out = LSTM(
+        units=LSTM_UNITS,
+        return_sequences=True,
+        stateful=True)(actions_input)
+
+    # Combined primary and auxiliary
+    x = keras.layers.concatenate([vision_out, actions_out])
+    x = Dense(units=DEEP_UNITS, activation='relu')(x)
+    x = Dense( units=DEEP_UNITS, activation='relu')(x)
+    x = Dense( units=DEEP_UNITS, activation='relu')(x)
+    main_output = Dense(
+        units=CLASSES,
+        activation='sigmoid',
+        name='main_output')(x)
+
+    # Finished model
+    model = Model(
+            inputs=[vision_input, actions_input],
+            outputs=[main_output])
     model.compile(
             loss='categorical_crossentropy',
             optimizer='adadelta',
@@ -119,28 +141,27 @@ def main():
     model = model_functional()
     model.summary()
     print()
-    # quit()
-
 
     # Train model
     train_data = []
+    # For each epoch
     for e in range(EPOCHS):
         print('Loading Training set for EPOCH ' + str(e + 1))
         train_n = roa_loader.load_training_set(training_set_path)
         print('Epoch: {}/{}'.format(e + 1, EPOCHS))
+        # For each replay
         for i in range(train_n):
             utls.print_label('\tTraining Batch', '{}/{}', [i + 1, train_n])
             # Get a single replay
             batch = roa_loader.next_training_batch()
             if not batch:
                 break
-            batch_x, batch_y = utls.generate_batches(batch)
+            batch_x, batch_y, batch_y1 = utls.generate_batches(batch)
             tsteps = batch_x.shape[0] // CLIP_LENGTH
-            # Get clips of the replay
+            # Split batch into equal-length clips
             clips = utls.generate_clips(
-                    batch_x, batch_y,
-                    BATCH_X_SHAPE, BATCH_Y_SHAPE,
-                    CLIP_LENGTH)
+                    batch_x, batch_y, batch_y1,
+                    VISION_INPUT_SHAPE, OUTPUT_SHAPE, CLIP_LENGTH)
             batch_scalars = utls.run_method(model.train_on_batch, clips, tsteps)
             ts = dt.datetime.now()
             for clip, (loss, accuracy) in enumerate(batch_scalars):
@@ -166,13 +187,12 @@ def main():
         batch = roa_loader.next_testing_batch()
         if not batch:
             break
-        batch_x, batch_y = utls.generate_batches(batch)
+        batch_x, batch_y, batch_y1 = utls.generate_batches(batch)
         timesteps = batch_x.shape[0] // CLIP_LENGTH
-
+        # Split batch into equal-length clips
         clips = utls.generate_clips(
-                batch_x, batch_y,
-                BATCH_X_SHAPE, BATCH_Y_SHAPE,
-                CLIP_LENGTH)  # noqa
+                batch_x, batch_y, batch_y1,
+                VISION_INPUT_SHAPE, OUTPUT_SHAPE, CLIP_LENGTH)  # noqa
         batch_scalars = utls.run_method(model.test_on_batch, clips, timesteps)
         ts = dt.datetime.now()
         for clip, (loss, accuracy) in enumerate(batch_scalars):

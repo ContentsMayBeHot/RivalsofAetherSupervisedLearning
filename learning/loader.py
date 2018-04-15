@@ -34,12 +34,14 @@ def unpack_sample(xdir_apath, y_apath):
     xysync.create_sync_from_npys(xdir_apath, y_apath)
     x = []
     y = []
+    y1 = []
     # For each synced frame in the replay
     for pair in xysync.synced_frames:
+        actions = pair.actions
         frame = utls.rgb2gray(pair.frame)
-        label = utls.reduce_classes(pair.actions)
-        x.append(frame)  # shape: (135, 240, 1)
-        y.append(label)  # shape: (9,)
+        x.append(frame)
+        y.append(utls.reduce_classes(actions))
+        y1.append(actions)
     return x, y
 
 
