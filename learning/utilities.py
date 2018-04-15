@@ -134,7 +134,9 @@ def listdir_np_only(apath):
     ]
 
 
-def generate_clips(x_data, y_data, x_clip_shape, y_clip_shape, clip_length, reshape_clips=True):  # noqa
+def generate_clips(x_data, y_data, y1_data, 
+    x_clip_shape, y_clip_shape, clip_length, 
+    reshape_clips=True):  # noqa
     '''
         generate clips from a given video / label pair
         PRE:
@@ -151,22 +153,30 @@ def generate_clips(x_data, y_data, x_clip_shape, y_clip_shape, clip_length, resh
     for index in range(0, x_data.shape[0], clip_length):
         x_clip = x_data[index:index + clip_length]
         y_clip = y_data[index:index + clip_length]
+        y1_clip = y1_data[index:index + clip_length]
 
         if(x_clip.shape[0] < clip_length):
             continue
+
         if(reshape_clips):
             x_clip = x_clip.reshape((x_clip_shape))
             y_clip = y_clip.reshape((y_clip_shape))
-        clips.append((x_clip, y_clip))
+            y1_clip = y1_clip.reshape((y_clip_shape))
+        clips.append((x_clip, y_clip, y1_clip))
 
     return clips
 
 
 def generate_batches(batch):
     batch_x, batch_y = batch
+    batch_y1 = list(batch_y)  # Copy y
+    batch_y1.insert(0, np.zeros(9,))  # Prepend with zeros
+
+    # Convert to NumPy arrays
     batch_x = np.array(batch_x, dtype=np.int32)
     batch_y = np.array(batch_y, dtype=np.int32)
-    return batch_x, batch_y
+    batch_y1 = np.array(batch_y1, dtype=np.int32)
+    return batch_x, batch_y, batch_y1
 
 
 def print_metrics(scalars):
@@ -185,7 +195,8 @@ def run_method(method, clips, timesteps):
     batch_scalars = []
     for i, clip in enumerate(clips):
         print_label('\t\tClip', '{}/{}', [i + 1, timesteps], '\t')
-        scalars = method(*clip)
+        clip_x, clip_y, clip_y1 = clip
+        scalars = method([clip_x, clip_y1], clip_y)
         print_metrics(scalars)
         batch_scalars.append(scalars)
     return batch_scalars
