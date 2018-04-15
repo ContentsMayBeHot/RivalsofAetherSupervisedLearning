@@ -27,7 +27,7 @@ VISION_INPUT_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
 ACTIONS_INPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
 OUTPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
 
-FILTERS = 20
+FILTERS = 10
 POOL_SIZE = (1, 135, 240)
 KERNEL_SIZE = (3, 3)
 
@@ -85,6 +85,14 @@ def model_functional():
             padding='same',
             return_sequences=True,
             stateful=True)(vision_input)
+    vision_x = BatchNormalization()(vision_x)
+    vision_x = ConvLSTM2D(
+            filters=FILTERS,
+            kernel_size=KERNEL_SIZE,
+            data_format='channels_last',
+            padding='same',
+            return_sequences=True,
+            stateful=True)(vision_x)
     vision_x = BatchNormalization()(vision_x)
     vision_x = AveragePooling3D(pool_size=POOL_SIZE)(vision_x)
     vision_out = Reshape(target_shape=(-1, FILTERS))(vision_x)
