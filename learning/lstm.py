@@ -14,7 +14,7 @@ from loader import ROALoader
 import utilities as utls
 
 
-EPOCHS = 4
+EPOCHS = 2
 MODEL_FNAME = 'rival2.h5'
 WEIGHTS_FNAME = 'rival2-w.h5'
 
