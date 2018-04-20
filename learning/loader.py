@@ -37,7 +37,9 @@ def unpack_sample(xdir_apath, y_apath):
     # For each synced frame in the replay
     for pair in xysync.synced_frames:
         actions = pair.actions
-        frame = utls.rgb2gray(pair.frame)
+        frame = pair.frame
+        frame = utls.rgb2gray(frame)
+        frame = utls.downscale_img(frame)
         x.append(frame)
         y.append(utls.reduce_classes(actions))
     return x, y

@@ -2,6 +2,7 @@ import datetime as dt
 import enum
 import numpy as np
 import os
+from skimage.transform import resize
 
 DATA_PATH = os.path.join('..', 'data')
 
@@ -55,7 +56,7 @@ def rgb2gray(rgb):
 
 
 def downscale_img(img):
-    return None
+    return resize(image=img, output_shape=(45, 80, 1))
 
 
 def pad_clip(x_clip, x_clip_shape, y_clip, y_clip_shape):

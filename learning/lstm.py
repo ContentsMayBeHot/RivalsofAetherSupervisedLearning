@@ -14,13 +14,13 @@ from loader import ROALoader
 import utilities as utls
 
 
-EPOCHS = 6
+EPOCHS = 1
 MODEL_FNAME = 'rival2.h5'
 WEIGHTS_FNAME = 'rival2-w.h5'
 
 CLASSES = 9
-IMG_U = 135
-IMG_V = 240
+IMG_U = 45
+IMG_V = 80
 IMG_C = 1
 CLIP_LENGTH = 100
 VISION_INPUT_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
@@ -28,7 +28,7 @@ ACTIONS_INPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
 OUTPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
 
 FILTERS = 10
-POOL_SIZE = (1, 135, 240)
+POOL_SIZE = (1, IMG_U, IMG_V)
 KERNEL_SIZE = (3, 3)
 
 LSTM_UNITS = 32
@@ -99,13 +99,13 @@ def model_functional():
 
     # Auxiliary
     actions_input = Input(
-        batch_shape=ACTIONS_INPUT_SHAPE,
-        name='actions_input'
+            batch_shape=ACTIONS_INPUT_SHAPE,
+            name='actions_input'
     )
     actions_out = LSTM(
-        units=LSTM_UNITS,
-        return_sequences=True,
-        stateful=True)(actions_input)
+            units=LSTM_UNITS,
+            return_sequences=True,
+            stateful=True)(actions_input)
 
     # Combined primary and auxiliary
     x = keras.layers.concatenate([vision_out, actions_out])
