@@ -6,7 +6,7 @@ import pandas as pd
 import keras
 import tensorflow as tf
 from keras.models import Sequential, Model
-from keras.layers import Dense, Reshape, GlobalAveragePooling2D, AveragePooling3D, Input, LSTM, TimeDistributed  # noqa
+from keras.layers import Dense, Reshape, GlobalAveragePooling2D, AveragePooling3D, Input, LSTM, TimeDistributed, Dropout  # noqa
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
 
@@ -22,25 +22,26 @@ CLASSES = 9
 IMG_U = 45
 IMG_V = 80
 IMG_C = 1
-CLIP_LENGTH = 100
+CLIP_LENGTH = 60
 VISION_INPUT_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
 ACTIONS_INPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
 OUTPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
 
-FILTERS = 10
+FILTERS = 40
 POOL_SIZE = (1, IMG_U, IMG_V)
-KERNEL_SIZE = (3, 3)
+KERNEL_SIZE = (5, 5)
 
 LSTM_UNITS = 32
 
-DEEP_UNITS = 64
+DEEP_UNITS = 128
+DROPOUT_RATE = 0.2
 
 TRAIN_LIMIT = 2
 TEST_LIMIT = 2
 
 
-def model_ConvLSTM2D():
-    # Define ConvLSTM2D model
+def model_sequential():
+    # Stacked 2D Convolutional LSTM layers
     model = Sequential()
     model.add(ConvLSTM2D(
             filters=FILTERS,
@@ -49,8 +50,7 @@ def model_ConvLSTM2D():
             data_format='channels_last',
             padding='same',
             return_sequences=True,
-            stateful=True
-    ))  # noqa
+            stateful=True))
     model.add(BatchNormalization())
     model.add(ConvLSTM2D(
             filters=FILTERS,
@@ -58,25 +58,52 @@ def model_ConvLSTM2D():
             data_format='channels_last',
             padding='same',
             return_sequences=True,
-            stateful=True
-    ))  # noqa
+            stateful=True))
+    model.add(BatchNormalization())
+    model.add(ConvLSTM2D(
+            filters=FILTERS,
+            kernel_size=KERNEL_SIZE,
+            data_format='channels_last',
+            padding='same',
+            return_sequences=True,
+            stateful=True))
+    model.add(BatchNormalization())
+    model.add(ConvLSTM2D(
+            filters=FILTERS,
+            kernel_size=KERNEL_SIZE,
+            data_format='channels_last',
+            padding='same',
+            return_sequences=True,
+            stateful=True))
     model.add(BatchNormalization())
     model.add(AveragePooling3D(POOL_SIZE))
     model.add(Reshape((-1, FILTERS)))
+
+    # Deep network
+    model.add(Dense(units=DEEP_UNITS, activation='relu'))
+    model.add(Dropout(rate=DROPOUT_RATE))
+    model.add(Dense(units=DEEP_UNITS, activation='relu'))
+    model.add(Dropout(rate=DROPOUT_RATE))
+    model.add(Dense(units=DEEP_UNITS, activation='relu'))
+    model.add(Dropout(rate=DROPOUT_RATE))
+
+    # Output layer
     model.add(Dense(CLASSES, activation='sigmoid'))
+
+    # Compile and return
     model.compile(
             loss='categorical_crossentropy',
             optimizer='adadelta',
-            metrics=['accuracy']
-    )  # noqa
+            metrics=['accuracy'])
     return model
 
 
 def model_functional():
-    # Primary
+    # Primary input: Image data
     vision_input = Input(
             batch_shape=VISION_INPUT_SHAPE,
             name='vision_input')
+    # Primary model: Stacked 2D convolutional LSTM
     vision_x = ConvLSTM2D(
             filters=FILTERS,
             kernel_size=KERNEL_SIZE,
@@ -97,21 +124,29 @@ def model_functional():
     vision_x = AveragePooling3D(pool_size=POOL_SIZE)(vision_x)
     vision_out = Reshape(target_shape=(-1, FILTERS))(vision_x)
 
-    # Auxiliary
+    # Auxiliary input: Previous labels
     actions_input = Input(
             batch_shape=ACTIONS_INPUT_SHAPE,
             name='actions_input'
     )
+    # Auxiliary model: LSTM
     actions_out = LSTM(
             units=LSTM_UNITS,
             return_sequences=True,
             stateful=True)(actions_input)
 
-    # Combined primary and auxiliary
+    # Concatenate primary and auxiliary
     x = keras.layers.concatenate([vision_out, actions_out])
+
+    # Deep neural network
     x = Dense(units=DEEP_UNITS, activation='relu')(x)
-    x = Dense( units=DEEP_UNITS, activation='relu')(x)
-    x = Dense( units=DEEP_UNITS, activation='relu')(x)
+    x = Dropout(rate=DROPOUT_RATE)(x)
+    x = Dense(units=DEEP_UNITS, activation='relu')(x)
+    x = Dropout(rate=DROPOUT_RATE)(x)
+    x = Dense(units=DEEP_UNITS, activation='relu')(x)
+    x = Dropout(rate=DROPOUT_RATE)(x)
+
+    # Output layer
     main_output = Dense(
         units=CLASSES,
         activation='sigmoid',
@@ -146,7 +181,7 @@ def main():
     test_n = roa_loader.load_testing_set(testing_set_path)
 
     # Get model
-    model = model_functional()
+    model = model_sequential()
     model.summary()
     print()
 

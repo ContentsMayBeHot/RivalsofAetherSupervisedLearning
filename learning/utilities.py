@@ -56,7 +56,7 @@ def rgb2gray(rgb):
 
 
 def downscale_img(img):
-    return resize(image=img, output_shape=(45, 80, 1))
+    return resize(image=img, output_shape=(45, 80, 1), mode='reflect')
 
 
 def pad_clip(x_clip, x_clip_shape, y_clip, y_clip_shape):
@@ -198,7 +198,7 @@ def run_method(method, clips, timesteps):
     for i, clip in enumerate(clips):
         print_label('\t\tClip', '{}/{}', [i + 1, timesteps], '\t')
         clip_x, clip_y, clip_y1 = clip
-        scalars = method([clip_x, clip_y1], clip_y)
+        scalars = method(clip_x, clip_y)
         print_metrics(scalars)
         batch_scalars.append(scalars)
     return batch_scalars
