@@ -198,7 +198,7 @@ def run_method(method, clips, timesteps):
     for i, clip in enumerate(clips):
         print_label('\t\tClip', '{}/{}', [i + 1, timesteps], '\t')
         clip_x, clip_y, clip_y1 = clip
-        scalars = method(clip_x, clip_y)
+        scalars = method([clip_x, clip_y1], clip_y)
         print_metrics(scalars)
         batch_scalars.append(scalars)
     return batch_scalars

@@ -27,13 +27,13 @@ VISION_INPUT_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
 ACTIONS_INPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
 OUTPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
 
-FILTERS = 40
+FILTERS = 48
 POOL_SIZE = (1, IMG_U, IMG_V)
 KERNEL_SIZE = (5, 5)
 
-LSTM_UNITS = 32
+LSTM_UNITS = 64
 
-DEEP_UNITS = 128
+DEEP_UNITS = 256
 DROPOUT_RATE = 0.2
 
 TRAIN_LIMIT = 2
@@ -121,8 +121,24 @@ def model_functional():
             return_sequences=True,
             stateful=True)(vision_x)
     vision_x = BatchNormalization()(vision_x)
+    vision_x = ConvLSTM2D(
+            filters=FILTERS,
+            kernel_size=KERNEL_SIZE,
+            data_format='channels_last',
+            padding='same',
+            return_sequences=True,
+            stateful=True)(vision_x)
+    vision_x = BatchNormalization()(vision_x)
+    vision_x = ConvLSTM2D(
+            filters=FILTERS,
+            kernel_size=KERNEL_SIZE,
+            data_format='channels_last',
+            padding='same',
+            return_sequences=True,
+            stateful=True)(vision_x)
+    vision_x = BatchNormalization()(vision_x)
     vision_x = AveragePooling3D(pool_size=POOL_SIZE)(vision_x)
-    vision_out = Reshape(target_shape=(-1, FILTERS))(vision_x)
+    vision_output = Reshape(target_shape=(-1, FILTERS))(vision_x)
 
     # Auxiliary input: Previous labels
     actions_input = Input(
@@ -130,27 +146,31 @@ def model_functional():
             name='actions_input'
     )
     # Auxiliary model: LSTM
-    actions_out = LSTM(
+    actions_x = LSTM(
             units=LSTM_UNITS,
             return_sequences=True,
             stateful=True)(actions_input)
+    actions_output = LSTM(
+            units=LSTM_UNITS,
+            return_sequences=True,
+            stateful=True)(actions_x)
 
     # Concatenate primary and auxiliary
-    x = keras.layers.concatenate([vision_out, actions_out])
+    main_x = keras.layers.concatenate([vision_output, actions_output])
 
     # Deep neural network
-    x = Dense(units=DEEP_UNITS, activation='relu')(x)
-    x = Dropout(rate=DROPOUT_RATE)(x)
-    x = Dense(units=DEEP_UNITS, activation='relu')(x)
-    x = Dropout(rate=DROPOUT_RATE)(x)
-    x = Dense(units=DEEP_UNITS, activation='relu')(x)
-    x = Dropout(rate=DROPOUT_RATE)(x)
+    main_x = Dense(units=DEEP_UNITS, activation='relu')(main_x)
+    main_x = Dropout(rate=DROPOUT_RATE)(main_x)
+    main_x = Dense(units=DEEP_UNITS, activation='relu')(main_x)
+    main_x = Dropout(rate=DROPOUT_RATE)(main_x)
+    main_x = Dense(units=DEEP_UNITS, activation='relu')(main_x)
+    main_x = Dropout(rate=DROPOUT_RATE)(main_x)
 
     # Output layer
     main_output = Dense(
         units=CLASSES,
         activation='sigmoid',
-        name='main_output')(x)
+        name='main_output')(main_x)
 
     # Finished model
     model = Model(
@@ -158,7 +178,7 @@ def model_functional():
             outputs=[main_output])
     model.compile(
             loss='categorical_crossentropy',
-            optimizer='adadelta',
+            optimizer='adam',
             metrics=['accuracy'])
     return model
 
@@ -181,7 +201,7 @@ def main():
     test_n = roa_loader.load_testing_set(testing_set_path)
 
     # Get model
-    model = model_sequential()
+    model = model_functional()
     model.summary()
     print()
 
