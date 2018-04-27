@@ -6,7 +6,7 @@ import pandas as pd
 import keras
 import tensorflow as tf
 from keras.models import Sequential, Model
-from keras.layers import Dense, Reshape, GlobalAveragePooling2D, AveragePooling3D, Input, LSTM, TimeDistributed, Dropout  # noqa
+from keras.layers import Dense, Reshape, GlobalAveragePooling2D, AveragePooling3D, Input, LSTM, TimeDistributed, Dropout, Conv2D # noqa
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
 
@@ -14,7 +14,7 @@ from loader import ROALoader
 import utilities as utls
 
 
-EPOCHS = 1
+EPOCHS = 10
 MODEL_FNAME = 'rival2.h5'
 WEIGHTS_FNAME = 'rival2-w.h5'
 
@@ -22,16 +22,16 @@ CLASSES = 9
 IMG_U = 45
 IMG_V = 80
 IMG_C = 1
-CLIP_LENGTH = 60
+CLIP_LENGTH = 100
 VISION_INPUT_SHAPE = (1, CLIP_LENGTH, IMG_U, IMG_V, IMG_C)
 ACTIONS_INPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
 OUTPUT_SHAPE = (1, CLIP_LENGTH, CLASSES)
 
-FILTERS = 48
+FILTERS = 32
 POOL_SIZE = (1, IMG_U, IMG_V)
-KERNEL_SIZE = (5, 5)
+KERNEL_SIZE = (3, 3)
 
-LSTM_UNITS = 64
+LSTM_UNITS = 48
 
 DEEP_UNITS = 256
 DROPOUT_RATE = 0.2
@@ -40,70 +40,12 @@ TRAIN_LIMIT = 2
 TEST_LIMIT = 2
 
 
-def model_sequential():
-    # Stacked 2D Convolutional LSTM layers
-    model = Sequential()
-    model.add(ConvLSTM2D(
-            filters=FILTERS,
-            kernel_size=KERNEL_SIZE,
-            batch_input_shape=VISION_INPUT_SHAPE,
-            data_format='channels_last',
-            padding='same',
-            return_sequences=True,
-            stateful=True))
-    model.add(BatchNormalization())
-    model.add(ConvLSTM2D(
-            filters=FILTERS,
-            kernel_size=KERNEL_SIZE,
-            data_format='channels_last',
-            padding='same',
-            return_sequences=True,
-            stateful=True))
-    model.add(BatchNormalization())
-    model.add(ConvLSTM2D(
-            filters=FILTERS,
-            kernel_size=KERNEL_SIZE,
-            data_format='channels_last',
-            padding='same',
-            return_sequences=True,
-            stateful=True))
-    model.add(BatchNormalization())
-    model.add(ConvLSTM2D(
-            filters=FILTERS,
-            kernel_size=KERNEL_SIZE,
-            data_format='channels_last',
-            padding='same',
-            return_sequences=True,
-            stateful=True))
-    model.add(BatchNormalization())
-    model.add(AveragePooling3D(POOL_SIZE))
-    model.add(Reshape((-1, FILTERS)))
-
-    # Deep network
-    model.add(Dense(units=DEEP_UNITS, activation='relu'))
-    model.add(Dropout(rate=DROPOUT_RATE))
-    model.add(Dense(units=DEEP_UNITS, activation='relu'))
-    model.add(Dropout(rate=DROPOUT_RATE))
-    model.add(Dense(units=DEEP_UNITS, activation='relu'))
-    model.add(Dropout(rate=DROPOUT_RATE))
-
-    # Output layer
-    model.add(Dense(CLASSES, activation='sigmoid'))
-
-    # Compile and return
-    model.compile(
-            loss='categorical_crossentropy',
-            optimizer='adadelta',
-            metrics=['accuracy'])
-    return model
-
-
 def model_functional():
     # Primary input: Image data
     vision_input = Input(
             batch_shape=VISION_INPUT_SHAPE,
             name='vision_input')
-    # Primary model: Stacked 2D convolutional LSTM
+    # Primary model: 2D convolutional LSTM
     vision_x = ConvLSTM2D(
             filters=FILTERS,
             kernel_size=KERNEL_SIZE,
@@ -113,30 +55,6 @@ def model_functional():
             return_sequences=True,
             stateful=True)(vision_input)
     vision_x = BatchNormalization()(vision_x)
-    vision_x = ConvLSTM2D(
-            filters=FILTERS,
-            kernel_size=KERNEL_SIZE,
-            data_format='channels_last',
-            padding='same',
-            return_sequences=True,
-            stateful=True)(vision_x)
-    vision_x = BatchNormalization()(vision_x)
-    vision_x = ConvLSTM2D(
-            filters=FILTERS,
-            kernel_size=KERNEL_SIZE,
-            data_format='channels_last',
-            padding='same',
-            return_sequences=True,
-            stateful=True)(vision_x)
-    vision_x = BatchNormalization()(vision_x)
-    vision_x = ConvLSTM2D(
-            filters=FILTERS,
-            kernel_size=KERNEL_SIZE,
-            data_format='channels_last',
-            padding='same',
-            return_sequences=True,
-            stateful=True)(vision_x)
-    vision_x = BatchNormalization()(vision_x)
     vision_x = AveragePooling3D(pool_size=POOL_SIZE)(vision_x)
     vision_output = Reshape(target_shape=(-1, FILTERS))(vision_x)
 
@@ -145,26 +63,15 @@ def model_functional():
             batch_shape=ACTIONS_INPUT_SHAPE,
             name='actions_input'
     )
-    # Auxiliary model: LSTM
-    actions_x = LSTM(
-            units=LSTM_UNITS,
-            return_sequences=True,
-            stateful=True)(actions_input)
-    actions_output = LSTM(
-            units=LSTM_UNITS,
-            return_sequences=True,
-            stateful=True)(actions_x)
 
     # Concatenate primary and auxiliary
-    main_x = keras.layers.concatenate([vision_output, actions_output])
+    main_x = keras.layers.concatenate([vision_output, actions_input])
 
     # Deep neural network
-    main_x = Dense(units=DEEP_UNITS, activation='relu')(main_x)
-    main_x = Dropout(rate=DROPOUT_RATE)(main_x)
-    main_x = Dense(units=DEEP_UNITS, activation='relu')(main_x)
-    main_x = Dropout(rate=DROPOUT_RATE)(main_x)
-    main_x = Dense(units=DEEP_UNITS, activation='relu')(main_x)
-    main_x = Dropout(rate=DROPOUT_RATE)(main_x)
+    main_x = LSTM(
+            units=LSTM_UNITS,
+            return_sequences=True,
+            stateful=True)(main_x)
 
     # Output layer
     main_output = Dense(
