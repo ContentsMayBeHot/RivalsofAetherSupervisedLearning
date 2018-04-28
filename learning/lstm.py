@@ -4,6 +4,7 @@ import os
 import numpy as np
 import pandas as pd
 import keras
+import sys
 import tensorflow as tf
 from keras.models import Sequential, Model
 from keras.layers import Dense, Reshape, GlobalAveragePooling2D, AveragePooling3D, Input, LSTM, TimeDistributed, Dropout, Conv2D # noqa
@@ -15,8 +16,8 @@ import utilities as utls
 
 
 EPOCHS = 10
-MODEL_FNAME = 'rival2.h5'
-WEIGHTS_FNAME = 'rival2-w.h5'
+MODEL_FNAME = 'rival.h5'
+WEIGHTS_FNAME = 'rival-w.h5'
 
 CLASSES = 9
 IMG_U = 45
@@ -91,6 +92,15 @@ def model_functional():
 
 
 def main():
+    resume_session = False
+    if len(sys.argv) > 1:
+        for arg in sys.argv[1:]:
+            if arg == '--resume' or arg == '-r':
+                resume_session = True
+            else:
+                print('Invalid argument "', arg, '"; terminating')
+                sys.exit(1)
+
     # Read ini file
     config = configparser.ConfigParser()
     config.read(os.path.join('..', 'config.ini'))
@@ -105,11 +115,16 @@ def main():
     training_set_path = config['SETS']['PathToTraining']
     # Load testing set
     testing_set_path = config['SETS']['PathToTesting']
-    test_n = roa_loader.load_testing_set(testing_set_path)
 
     # Get model
     model = model_functional()
     model.summary()
+
+    # Optionally, load weights from prior session
+    if resume_session:
+        weights_path = os.path.join('..', 'models', WEIGHTS_FNAME)
+        print('Loading weights from', os.path.realpath(weights_path))
+        model.load_weights(weights_path)
     print()
 
     # Train model
@@ -117,7 +132,8 @@ def main():
     # For each epoch
     for e in range(EPOCHS):
         print('Loading Training set for EPOCH ' + str(e + 1))
-        train_n = roa_loader.load_training_set(training_set_path)
+        train_n = roa_loader.load_training_set(
+                training_set_path, max_queue_size=32)
         print('Epoch: {}/{}'.format(e + 1, EPOCHS))
         # For each replay
         for i in range(train_n):
@@ -149,6 +165,9 @@ def main():
     train_df.to_csv(train_csv_fpath)
     print('Saving training metrics to:', os.path.realpath(train_csv_fpath))
     print()
+
+    # Start loading testing data
+    test_n = roa_loader.load_testing_set(testing_set_path, max_queue_size=32)
 
     # Test model
     test_data = []
